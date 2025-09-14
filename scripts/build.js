@@ -73,6 +73,26 @@ function firstImageFrom(record) {
   return url || null;
 }
 
+function firstVideoFrom(record) {
+  const videos = record.Video || record.Videos || record["סרטון (Video)"] || record["תמונה (Image)"]; // Check both video and image fields
+  const url = Array.isArray(videos) ? first(videos.map(x => x.url || x).filter(Boolean)) : null;
+  return url || null;
+}
+
+function isVideoUrl(url) {
+  if (!url) return false;
+  const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.mkv'];
+  const videoMimeTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'];
+  
+  // Check file extension
+  const hasVideoExtension = videoExtensions.some(ext => url.toLowerCase().includes(ext));
+  
+  // Check if it's a video URL (YouTube, Vimeo, etc.)
+  const isVideoPlatform = url.includes('youtube.com') || url.includes('youtu.be') || url.includes('vimeo.com');
+  
+  return hasVideoExtension || isVideoPlatform;
+}
+
 function writeHtml(relPath, html) {
   const full = path.join(outDir, relPath.replace(/^\//, ""));
   writeFile(full, html);
@@ -141,13 +161,39 @@ async function build() {
     const activeHeroes = hero.filter(h => h["פעיל (Active)"] !== false);
     const heroSlides = activeHeroes.map((heroData, index) => {
       const heroImage = firstImageFrom(heroData);
+      const heroVideo = firstVideoFrom(heroData);
       const heroTitle = heroData["כותרת ראשית (Main Heading)"] || SITE_NAME;
       const heroSubtitle = heroData["כותרת משנה (Subheading)"] || "חוויה קולינרית ייחודית לאירועים בלתי נשכחים";
+      
+      // Determine if we have a video or image
+      const mediaUrl = heroVideo || heroImage;
+      const isVideo = mediaUrl && isVideoUrl(mediaUrl);
+      
+      let mediaElement = '';
+      if (isVideo) {
+        if (mediaUrl.includes('youtube.com') || mediaUrl.includes('youtu.be')) {
+          // YouTube video - create embed
+          const videoId = mediaUrl.includes('youtu.be') 
+            ? mediaUrl.split('youtu.be/')[1]?.split('?')[0]
+            : mediaUrl.split('v=')[1]?.split('&')[0];
+          mediaElement = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1" class="hero-bg-video" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+        } else if (mediaUrl.includes('vimeo.com')) {
+          // Vimeo video - create embed
+          const videoId = mediaUrl.split('vimeo.com/')[1]?.split('?')[0];
+          mediaElement = `<iframe src="https://player.vimeo.com/video/${videoId}?autoplay=1&muted=1&loop=1&controls=0&background=1" class="hero-bg-video" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+        } else {
+          // Direct video file
+          mediaElement = `<video class="hero-bg-video" autoplay muted loop playsinline><source src="${mediaUrl}" type="video/mp4">Your browser does not support the video tag.</video>`;
+        }
+      } else if (mediaUrl) {
+        // Image
+        mediaElement = `<img src="${mediaUrl}" alt="${heroTitle}" class="hero-bg-image">`;
+      }
       
       return `
         <div class="hero-slide ${index === 0 ? 'active' : ''}" data-slide="${index}">
           <div class="hero-background">
-            ${heroImage ? `<img src="${heroImage}" alt="${heroTitle}" class="hero-bg-image">` : ''}
+            ${mediaElement}
             <div class="hero-overlay"></div>
           </div>
           <div class="hero-content">
