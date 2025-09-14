@@ -149,7 +149,7 @@ async function build() {
             </div>
           </div>
           <div class="hero-image">
-            ${heroImage ? `<img src="${heroImage}" alt="מסעדת ${SITE_NAME}">` : `<div style="width:400px;height:400px;border-radius:20px;background:linear-gradient(45deg, #23232a 25%, #2a2a32 25%, #2a2a32 50%, #23232a 50%, #23232a 75%, #2a2a32 75%);background-size:20px 20px;display:flex;align-items:center;justify-content:center;color:#666;font-size:48px;">🍽️</div>`}
+            ${heroImage ? `<img src="${heroImage}" alt="מסעדת ${SITE_NAME}">` : `<div class="hero-placeholder">🍽️</div>`}
           </div>
         </div>
       </section>
@@ -181,19 +181,19 @@ async function build() {
     // About section - use Airtable data if available, otherwise fallback
     const aboutData = about.length > 0 ? about[0] : null;
     const aboutSection = `
-      <section class="about-section" id="about" style="padding: 100px 40px; background: rgba(255,255,255,0.05); margin: 60px 0;">
-        <div style="max-width: 1200px; margin: 0 auto;">
-          <h2 style="font-size: 3rem; color: var(--fg); text-align: center; margin-bottom: 60px; font-weight: 700;">אודותינו</h2>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
-            <div>
-              <h3 style="font-size: 2rem; color: var(--gold); margin-bottom: 30px;">${aboutData?.["Section Title"] || SITE_NAME}</h3>
-              <p style="font-size: 1.2rem; line-height: 1.8; color: var(--fg); margin-bottom: 20px;">
+      <section class="about-section" id="about">
+        <div class="about-container">
+          <h2 class="about-title">אודותינו</h2>
+          <div class="about-content">
+            <div class="about-text">
+              <h3>${aboutData?.["Section Title"] || SITE_NAME}</h3>
+              <p>
                 ${aboutData?.Description || aboutData?.Content || "מסעדת הנמל 24 מציעה חוויה קולינרית ייחודית באווירה אלגנטית וחמימה. אנו מתמחים באירועים פרטיים ועסקיים, ומציעים תפריטים מותאמים אישית לכל אירוע."}
               </p>
-              ${aboutData?.Additional_Info ? `<p style="font-size: 1.1rem; line-height: 1.8; color: var(--muted);">${aboutData.Additional_Info}</p>` : ""}
+              ${aboutData?.Additional_Info ? `<p class="additional-info">${aboutData.Additional_Info}</p>` : ""}
             </div>
-            <div style="text-align: center;">
-              ${aboutData?.Image ? `<img src="${aboutData.Image}" alt="אודות ${SITE_NAME}" style="width: 100%; max-width: 500px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">` : `<div style="width: 100%; height: 400px; background: linear-gradient(45deg, #23232a 25%, #2a2a32 25%, #2a2a32 50%, #23232a 50%, #23232a 75%, #2a2a32 75%); background-size: 20px 20px; border-radius: 20px; display: flex; align-items: center; justify-content: center; color: #666; font-size: 48px;">🍽️</div>`}
+            <div class="about-image">
+              ${aboutData?.Image ? `<img src="${aboutData.Image}" alt="אודות ${SITE_NAME}">` : `<div class="about-placeholder">🍽️</div>`}
             </div>
           </div>
         </div>
@@ -202,17 +202,17 @@ async function build() {
     
     // Packages section
     const packagesSection = `
-      <section class="packages-section" id="packages" style="padding: 100px 40px; background: rgba(255,255,255,0.02); margin: 60px 0;">
-        <div style="max-width: 1200px; margin: 0 auto;">
-          <h2 style="font-size: 3rem; color: var(--fg); text-align: center; margin-bottom: 60px; font-weight: 700;">חבילות האירועים שלנו</h2>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+      <section class="packages-section" id="packages">
+        <div class="packages-container">
+          <h2 class="packages-title">חבילות האירועים שלנו</h2>
+          <div class="packages-grid">
             ${packages.map(pkg => `
-              <div style="background: var(--card); border-radius: 20px; padding: 30px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
-                <h3 style="font-size: 1.5rem; color: var(--gold); margin-bottom: 15px;">${pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name || "חבילה"}</h3>
-                ${pkg["מחיר (Price)"] || pkg.Price ? `<div style="font-size: 1.2rem; color: var(--fg); margin-bottom: 15px; font-weight: 600;">${money(pkg["מחיר (Price)"] || pkg.Price)}</div>` : ""}
-                ${pkg["תיאור (Description)"] || pkg.Description ? `<p style="color: var(--muted); line-height: 1.6; margin-bottom: 20px;">${pkg["תיאור (Description)"] || pkg.Description}</p>` : ""}
-                ${pkg["תמונה (Image)"] ? `<img src="${Array.isArray(pkg["תמונה (Image)"]) ? pkg["תמונה (Image)"][0].url : pkg["תמונה (Image)"]}" alt="${pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 15px;">` : ""}
-                <a href="/packages/${slugify(pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name || "package")}/" style="display: inline-block; background: var(--gold); color: var(--bg); padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s ease;">לפרטים נוספים</a>
+              <div class="package-card">
+                <h3 class="package-title">${pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name || "חבילה"}</h3>
+                ${pkg["מחיר (Price)"] || pkg.Price ? `<div class="package-price">${money(pkg["מחיר (Price)"] || pkg.Price)}</div>` : ""}
+                ${pkg["תיאור (Description)"] || pkg.Description ? `<p class="package-description">${pkg["תיאור (Description)"] || pkg.Description}</p>` : ""}
+                ${pkg["תמונה (Image)"] ? `<img src="${Array.isArray(pkg["תמונה (Image)"]) ? pkg["תמונה (Image)"][0].url : pkg["תמונה (Image)"]}" alt="${pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name}" class="package-image">` : ""}
+                <a href="/packages/${slugify(pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name || "package")}/" class="package-link">לפרטים נוספים</a>
               </div>
             `).join("")}
           </div>
@@ -275,19 +275,19 @@ async function build() {
 
   // per-event
   for (const e of normalizedEvents) {
-    const heroImg = firstImageFrom(e) ? `<img src="${firstImageFrom(e)}" alt="${e["Event Name"] || e.Title || e.Name}" style="width:100%;height:400px;object-fit:cover;border-radius:20px;margin-bottom:40px;">` : "";
-    const menuLinks = e.linkedMenus.map(m => `<li><a href="/menus/${m.slug}/" style="color:var(--gold);text-decoration:none;">${m.Title || m.Name}</a></li>`).join("");
-    const pkgList = e.linkedPkgs.map(p => `<li style="padding:10px 0;border-bottom:1px solid rgba(212,175,55,0.2);">${p.Title || p.Name}${p.Price ? ` · ${money(p.Price)}` : ""}</li>`).join("");
+    const heroImg = firstImageFrom(e) ? `<img src="${firstImageFrom(e)}" alt="${e["Event Name"] || e.Title || e.Name}" class="hero-img">` : "";
+    const menuLinks = e.linkedMenus.map(m => `<li class="event-link-item"><a href="/menus/${m.slug}/">${m.Title || m.Name}</a></li>`).join("");
+    const pkgList = e.linkedPkgs.map(p => `<li class="event-link-item">${p.Title || p.Name}${p.Price ? ` · ${money(p.Price)}` : ""}</li>`).join("");
     const body = `
-      <section class="events-section" style="margin-top: 0; padding-top: 120px;">
-        <div style="max-width:800px;margin:0 auto;">
-          <h1 style="font-size:3rem;color:var(--gold);margin-bottom:20px;text-align:center;">${e["Event Name"] || e.Title || e.Name}</h1>
-          <div class="event-date" style="text-align:center;margin-bottom:40px;font-size:1.2rem;">${e.start ? `תאריך: ${e.start.slice(0,10)}` : ""}</div>
+      <section class="events-section">
+        <div class="event-container">
+          <h1 class="event-title">${e["Event Name"] || e.Title || e.Name}</h1>
+          <div class="event-date">${e.start ? `תאריך: ${e.start.slice(0,10)}` : ""}</div>
           ${heroImg}
-          <div style="background:var(--card);padding:40px;border-radius:20px;margin-bottom:40px;">
-            ${e.Description || (typeof e["Event Summary (AI)"] === 'string' ? e["Event Summary (AI)"] : '') ? `<p style="font-size:1.1rem;line-height:1.8;color:var(--muted);margin-bottom:30px;">${e.Description || (typeof e["Event Summary (AI)"] === 'string' ? e["Event Summary (AI)"] : '')}</p>` : ""}
-            ${menuLinks ? `<h2 style="color:var(--gold);margin-bottom:20px;">תפריטים</h2><ul style="list-style:none;padding:0;">${menuLinks}</ul>` : ""}
-            ${pkgList ? `<h2 style="color:var(--gold);margin:30px 0 20px 0;">חבילות</h2><ul style="list-style:none;padding:0;">${pkgList}</ul>` : ""}
+          <div class="event-content">
+            ${e.Description || (typeof e["Event Summary (AI)"] === 'string' ? e["Event Summary (AI)"] : '') ? `<p class="event-description">${e.Description || (typeof e["Event Summary (AI)"] === 'string' ? e["Event Summary (AI)"] : '')}</p>` : ""}
+            ${menuLinks ? `<h2 class="event-section-title">תפריטים</h2><ul class="event-links">${menuLinks}</ul>` : ""}
+            ${pkgList ? `<h2 class="event-section-title packages">חבילות</h2><ul class="event-links">${pkgList}</ul>` : ""}
           </div>
         </div>
       </section>
@@ -364,13 +364,13 @@ async function build() {
     const body = `
       <article>
         <h1>${p["שם חבילה (Package Name)"] || p.Title || p.Name}</h1>
-        ${p["מחיר (Price)"] ? `<p class="meta" style="font-size: 1.2rem; color: var(--gold); font-weight: 600;">${money(p["מחיר (Price)"])}</p>` : ""}
-        ${packageImage ? `<img src="${packageImage}" alt="${p["שם חבילה (Package Name)"] || p.Title || p.Name}" style="width: 100%; max-width: 500px; height: 300px; object-fit: cover; border-radius: 15px; margin: 20px 0;">` : ""}
-        ${p["תיאור (Description)"] ? `<p style="font-size: 1.1rem; line-height: 1.8; color: var(--fg);">${p["תיאור (Description)"]}</p>` : ""}
+        ${p["מחיר (Price)"] ? `<p class="package-detail-price">${money(p["מחיר (Price)"])}</p>` : ""}
+        ${packageImage ? `<img src="${packageImage}" alt="${p["שם חבילה (Package Name)"] || p.Title || p.Name}" class="package-detail-image">` : ""}
+        ${p["תיאור (Description)"] ? `<p class="package-detail-description">${p["תיאור (Description)"]}</p>` : ""}
       </article>
     `;
     const html = layout({
-      title: p["שם חבילה (Package Name)"] || p.Title || p.Name,
+      title: p["שם חבילה (Package Name)"] || p.Title || p.Name || "חבילת אירוע",
       description: p.SEO_Description || p["תיאור (Description)"] || "חבילת אירוע",
       body,
       url: `${BASE_URL}/packages/${p.slug}/`,
