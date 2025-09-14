@@ -33,7 +33,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
         
-      - name: Check secrets
+      - name: Check required secrets
         run: |
           if [ -z "${{ secrets.AIRTABLE_TOKEN }}" ]; then
             echo "❌ AIRTABLE_TOKEN secret is not set!"
@@ -45,17 +45,17 @@ jobs:
             echo "Please add it at: https://github.com/Taras-Galper/Hanamal24-events/settings/secrets/actions"
             exit 1
           fi
-          echo "✅ Secrets are configured"
+          echo "✅ Required secrets are configured"
           
       - name: Build site
         env:
           AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
           AIRTABLE_BASE: ${{ secrets.AIRTABLE_BASE }}
-          BASE_URL: ${{ secrets.BASE_URL || 'https://taras-galper.github.io/Hanamal24-events' }}
-          SITE_NAME: ${{ secrets.SITE_NAME || 'Hanamal 24' }}
-          SITE_CITY: ${{ secrets.SITE_CITY || 'Haifa' }}
-          SITE_COUNTRY: ${{ secrets.SITE_COUNTRY || 'IL' }}
-          CUISINE: ${{ secrets.CUISINE || 'French' }}
+          BASE_URL: 'https://taras-galper.github.io/Hanamal24-events'
+          SITE_NAME: 'Hanamal 24'
+          SITE_CITY: 'Haifa'
+          SITE_COUNTRY: 'IL'
+          CUISINE: 'French'
         run: npm run build
         
       - name: Upload build artifacts
