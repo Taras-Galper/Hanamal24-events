@@ -109,8 +109,8 @@ async function build() {
     })
   );
   const pkgMap = Object.fromEntries(
-    packages.map(p => {
-      const slug = p.slug || slugify(p["שם חבילה (Package Name)"] || p.Title || p.Name);
+    packages.map((p, index) => {
+      const slug = p.slug || slugify(p["שם חבילה (Package Name)"] || p.Title || p.Name) || `package-${index + 1}`;
       return [p.id, { ...p, slug }];
     })
   );
