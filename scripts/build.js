@@ -89,16 +89,17 @@ async function build() {
   copyStatic();
 
   console.log("Fetching data from Airtable...");
-  const [events, menus, packages, dishes, about] = await Promise.all([
+  const [events, menus, packages, dishes, about, hero] = await Promise.all([
     fetchAll("Events"),
     fetchAll("Menus"),
     fetchAll("tbl9C40JxeIkue5So"), // Correct Packages table ID
     fetchAll("tblbi9b9lUjRRrAhW"), // Correct Dishes table ID
-    fetchAll("tblvhDaSZbzlYP9bh") // Correct About table ID
+    fetchAll("tblvhDaSZbzlYP9bh"), // Correct About table ID
+    fetchAll("tblOe7ONKtB6A9Q6L") // Hero table ID
   ]);
 
-  console.log(`Found ${events.length} events, ${menus.length} menus, ${packages.length} packages, ${dishes.length} dishes, ${about.length} about records`);
-  console.log("Packages data:", JSON.stringify(packages, null, 2));
+  console.log(`Found ${events.length} events, ${menus.length} menus, ${packages.length} packages, ${dishes.length} dishes, ${about.length} about records, ${hero.length} hero records`);
+  console.log("Hero data:", JSON.stringify(hero, null, 2));
 
   const dishMap = Object.fromEntries(dishes.map(d => [d.id, d]));
   const menuMap = Object.fromEntries(
@@ -136,20 +137,25 @@ async function build() {
 
   // home
   {
-    const heroImage = normalizedEvents.length > 0 ? firstImageFrom(normalizedEvents[0]) : null;
-    const hero = `
+    // Get hero data from Airtable
+    const heroData = hero.length > 0 ? hero[0] : null;
+    const heroImage = heroData ? firstImageFrom(heroData) : (normalizedEvents.length > 0 ? firstImageFrom(normalizedEvents[0]) : null);
+    const heroTitle = heroData?.["כותרת ראשית (Main Heading)"] || SITE_NAME;
+    const heroSubtitle = heroData?.["כותרת משנה (Subheading)"] || "חוויה קולינרית ייחודית לאירועים בלתי נשכחים";
+    
+    const heroSection = `
       <section class="hero">
         <div class="hero-content">
           <div class="hero-text">
-            <h1>${SITE_NAME}</h1>
-            <p>חוויה קולינרית ייחודית לאירועים בלתי נשכחים</p>
+            <h1>${heroTitle}</h1>
+            <p>${heroSubtitle}</p>
             <div class="hero-buttons">
               <a href="#categories" class="hero-btn-primary">גלה את התפריט</a>
               <a href="#contact" class="hero-btn-secondary">צור קשר</a>
             </div>
           </div>
           <div class="hero-image">
-            ${heroImage ? `<img src="${heroImage}" alt="מסעדת ${SITE_NAME}">` : `<div class="hero-placeholder">🍽️</div>`}
+            ${heroImage ? `<img src="${heroImage}" alt="${heroTitle}">` : `<div class="hero-placeholder">🍽️</div>`}
           </div>
         </div>
       </section>
@@ -223,7 +229,7 @@ async function build() {
     const html = layout({
       title: SITE_NAME,
       description: `${SITE_NAME} – אירועים וחוויות קולינריות בחיפה`,
-      body: `${hero}${categoriesSection}${aboutSection}${packagesSection}`,
+      body: `${heroSection}${categoriesSection}${aboutSection}${packagesSection}`,
       url: `${BASE_URL}/`,
       jsonld: {
         "@context": "https://schema.org",
