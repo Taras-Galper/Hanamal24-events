@@ -13,7 +13,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const AIRTABLE_BASE  = process.env.AIRTABLE_BASE;
-const BASE_URL       = process.env.BASE_URL || "https://example.com";
+const BASE_URL       = process.env.BASE_URL || "https://taras-galper.github.io/Hanamal24-events";
 const SITE_NAME      = process.env.SITE_NAME || "Hanamal 24";
 const SITE_CITY      = process.env.SITE_CITY || "Haifa";
 const SITE_COUNTRY   = process.env.SITE_COUNTRY || "IL";
