@@ -134,18 +134,19 @@ class ContactFormHandler {
   }
 
   async submitLead(leadData) {
-    // Store the lead locally first
-    this.storeLeadLocally(leadData);
-    
-    // Try serverless function if available
+    // Try to submit to Airtable via serverless function first
     try {
       await this.submitToServerless(leadData);
+      // If successful, show success message and return
+      this.showMessage('הבקשה נשלחה בהצלחה! נחזור אליכם בהקדם.', 'success');
+      this.form.reset();
       return;
     } catch (error) {
-      console.log('Serverless submission not available, using email method...');
+      console.log('Serverless submission failed, storing locally and showing email option...');
     }
 
-    // Show success message and provide email option
+    // Fallback: Store locally and show email option
+    this.storeLeadLocally(leadData);
     this.showMessage('הבקשה נשמרה בהצלחה! אנא שלחו לנו אימייל עם הפרטים הבאים:', 'success');
     this.showEmailOption(leadData);
   }
@@ -182,22 +183,41 @@ class ContactFormHandler {
 
   async submitToServerless(leadData) {
     // Try to submit to the serverless function
-    const response = await fetch('/api/submit-lead', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(leadData)
-    });
+    // First try the deployed Vercel function, then fallback to local
+    const urls = [
+      'https://hanamal24-events.vercel.app/api/submit-lead',
+      '/api/submit-lead'
+    ];
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to submit lead');
+    for (const url of urls) {
+      try {
+        console.log(`Trying to submit to: ${url}`);
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(leadData)
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          console.log('Lead submitted successfully to Airtable:', result);
+          return result;
+        } else {
+          const errorData = await response.json();
+          console.log(`Error from ${url}:`, errorData);
+          throw new Error(errorData.message || `HTTP ${response.status}`);
+        }
+      } catch (error) {
+        console.log(`Failed to submit to ${url}:`, error.message);
+        if (url === urls[urls.length - 1]) {
+          // This was the last URL, re-throw the error
+          throw error;
+        }
+        // Continue to next URL
+      }
     }
-
-    const result = await response.json();
-    console.log('Lead submitted successfully:', result);
-    return result;
   }
 
   showEmailOption(leadData) {

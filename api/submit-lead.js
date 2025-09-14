@@ -1,53 +1,49 @@
 // Serverless function to submit leads to Airtable
-// This can be deployed to Vercel, Netlify Functions, or similar platforms
+// Deploy this to Vercel for automatic Airtable submission
 
 const AIRTABLE_BASE_ID = 'appeW41fJAbVdeWoU';
 const AIRTABLE_TABLE_ID = 'tblTMBjuWZ8BATqTj';
 
-exports.handler = async (event, context) => {
+// Vercel serverless function handler
+export default async function handler(req, res) {
   // Handle CORS
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Content-Type': 'application/json'
-  };
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Content-Type', 'application/json');
 
   // Handle preflight requests
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: ''
-    };
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
   }
 
   // Only allow POST requests
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method not allowed' })
-    };
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
     // Parse the request body
-    const leadData = JSON.parse(event.body);
+    const leadData = req.body;
     
     // Validate required fields
     const requiredFields = ['fullName', 'email', 'phone', 'eventType', 'guestCount', 'eventDate'];
     const missingFields = requiredFields.filter(field => !leadData[field]);
     
     if (missingFields.length > 0) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ 
-          error: 'Missing required fields', 
-          missingFields 
-        })
-      };
+      return res.status(400).json({ 
+        error: 'Missing required fields', 
+        missingFields 
+      });
+    }
+
+    // Check if Airtable token is available
+    if (!process.env.AIRTABLE_TOKEN) {
+      console.error('AIRTABLE_TOKEN environment variable is not set');
+      return res.status(500).json({ 
+        error: 'Server configuration error',
+        message: 'Airtable token not configured'
+      });
     }
 
     // Format data for Airtable
@@ -66,6 +62,8 @@ exports.handler = async (event, context) => {
       }
     };
 
+    console.log('Submitting to Airtable:', airtableData);
+
     // Submit to Airtable
     const airtableResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_ID}`, {
       method: 'POST',
@@ -79,32 +77,29 @@ exports.handler = async (event, context) => {
     if (!airtableResponse.ok) {
       const errorText = await airtableResponse.text();
       console.error('Airtable API error:', errorText);
-      throw new Error(`Airtable API error: ${airtableResponse.status}`);
+      return res.status(500).json({ 
+        error: 'Airtable API error',
+        message: `Failed to submit to Airtable: ${airtableResponse.status}`,
+        details: errorText
+      });
     }
 
     const result = await airtableResponse.json();
-    console.log('Lead submitted successfully:', result);
+    console.log('Lead submitted successfully to Airtable:', result);
 
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ 
-        success: true, 
-        message: 'Lead submitted successfully',
-        leadId: result.id 
-      })
-    };
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Lead submitted successfully to Airtable',
+      leadId: result.id,
+      airtableRecord: result
+    });
 
   } catch (error) {
     console.error('Error submitting lead:', error);
     
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ 
-        error: 'Internal server error',
-        message: error.message 
-      })
-    };
+    return res.status(500).json({ 
+      error: 'Internal server error',
+      message: error.message 
+    });
   }
-};
+}
