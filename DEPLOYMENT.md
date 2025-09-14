@@ -5,52 +5,55 @@
 This repository is configured with GitHub Actions to automatically rebuild and deploy your site.
 
 ### Features:
-- **Automatic rebuilds every 6 hours** - Keeps your site updated with latest Airtable data
 - **Manual rebuilds** - Trigger builds from GitHub UI when needed
 - **Code-triggered rebuilds** - Rebuilds when you push changes to main branch
 - **GitHub Pages deployment** - Automatically deploys to `https://taras-galper.github.io/Hanamal24-events`
 
-### Setup Instructions:
+## Quick Setup (5 minutes):
 
-#### 1. Enable GitHub Pages
-1. Go to your repository: `https://github.com/Taras-Galper/Hanamal24-events`
-2. Click **Settings** → **Pages**
-3. Under **Source**, select **GitHub Actions**
-4. Save the settings
+### Step 1: Add Airtable Secrets
+1. Go to: https://github.com/Taras-Galper/Hanamal24-events/settings/secrets/actions
+2. Click **"New repository secret"** and add these two secrets:
 
-#### 2. Add Required Secrets
-Go to **Settings** → **Secrets and variables** → **Actions** and add:
+**Secret 1:**
+- Name: `AIRTABLE_TOKEN`
+- Value: `patfEh10eMje6sACP.b76a7392aee5a154df6fa1910991097e2eeb0f61984daff39ac15d4f0d4a1ec6`
 
-**Required:**
-- `AIRTABLE_TOKEN` - Your Airtable Personal Access Token
-- `AIRTABLE_BASE` - Your Airtable Base ID
+**Secret 2:**
+- Name: `AIRTABLE_BASE`
+- Value: `appeW41fJAbVdeWoU`
 
-**Optional (will use defaults if not set):**
-- `BASE_URL` - Your site URL (default: `https://taras-galper.github.io/Hanamal24-events`)
-- `SITE_NAME` - Site name (default: `Hanamal 24`)
-- `SITE_CITY` - City (default: `Haifa`)
-- `SITE_COUNTRY` - Country (default: `IL`)
-- `CUISINE` - Cuisine type (default: `French`)
-- `CUSTOM_DOMAIN` - Custom domain (if you have one)
+### Step 2: Enable GitHub Pages
+1. Go to: https://github.com/Taras-Galper/Hanamal24-events/settings/pages
+2. Under **Source**, select **"GitHub Actions"**
+3. Click **Save**
 
-#### 3. Test the Setup
-1. Push these changes to GitHub
-2. Go to **Actions** tab in your repository
-3. You should see the workflow running
-4. Once complete, your site will be live at: `https://taras-galper.github.io/Hanamal24-events`
+### Step 3: Test the Setup
+1. Go to: https://github.com/Taras-Galper/Hanamal24-events/actions
+2. Click **"Build and Deploy Site"**
+3. Click **"Run workflow"** → **"Run workflow"**
+4. Wait for it to complete (2-3 minutes)
+5. Your site will be live at: **https://taras-galper.github.io/Hanamal24-events**
 
-### How It Works:
+## How It Works:
 
-1. **Every 6 hours**: GitHub Actions fetches fresh data from Airtable and rebuilds the site
-2. **On code changes**: When you push to main branch, it rebuilds and deploys
-3. **Manual trigger**: Go to Actions → "Build and Deploy Site" → "Run workflow"
+1. **On code changes**: When you push to main branch, it rebuilds and deploys
+2. **Manual trigger**: Go to Actions → "Build and Deploy Site" → "Run workflow"
+3. **Airtable data**: Fetches fresh data from your Airtable on every build
 
-### Monitoring:
-- Check the **Actions** tab to see build status
-- Build logs will show if Airtable data was fetched successfully
-- Failed builds will send email notifications (if configured)
+## Troubleshooting:
 
-### Benefits:
+**If the workflow fails:**
+1. Check the **Actions** tab for error details
+2. Make sure both secrets are added correctly
+3. Ensure GitHub Pages is enabled
+
+**If the site doesn't update:**
+1. Go to Actions → "Build and Deploy Site" → "Run workflow"
+2. Wait for completion
+3. Check the site URL
+
+## Benefits:
 - ✅ **Always up-to-date** - Site refreshes with latest Airtable data
 - ✅ **Zero maintenance** - Runs automatically
 - ✅ **Fast deployment** - Static files deploy in seconds

@@ -1,10 +1,6 @@
 name: Build and Deploy Site
 
 on:
-  # Automatic rebuild every 6 hours
-  schedule:
-    - cron: '0 */6 * * *'
-  
   # Manual trigger from GitHub UI
   workflow_dispatch:
     inputs:
@@ -54,7 +50,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
-          cname: ${{ secrets.CUSTOM_DOMAIN || '' }}
           
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
