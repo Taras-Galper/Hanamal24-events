@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://airtable.com/appeW41fJAbVdeWoU/tblTMBjuWZ8BATqTj/viwApK9uDE3MjX2iU?blocks=hide/sitemap.xml
