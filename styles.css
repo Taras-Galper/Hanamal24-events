@@ -63,6 +63,13 @@ header {
   color: var(--gold);
   text-decoration: none;
   letter-spacing: 2px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.brand:hover {
+  color: var(--dark-gold);
+  transform: scale(1.05);
 }
 
 .nav {
