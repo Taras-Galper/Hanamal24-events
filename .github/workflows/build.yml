@@ -1,0 +1,64 @@
+name: Build and Deploy Site
+
+on:
+  # Automatic rebuild every 6 hours
+  schedule:
+    - cron: '0 */6 * * *'
+  
+  # Manual trigger from GitHub UI
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual build'
+        required: false
+        default: 'Manual rebuild'
+  
+  # Rebuild when code changes
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'README.md'
+      - '.gitignore'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build site
+        env:
+          AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
+          AIRTABLE_BASE: ${{ secrets.AIRTABLE_BASE }}
+          BASE_URL: ${{ secrets.BASE_URL || 'https://taras-galper.github.io/Hanamal24-events' }}
+          SITE_NAME: ${{ secrets.SITE_NAME || 'Hanamal 24' }}
+          SITE_CITY: ${{ secrets.SITE_CITY || 'Haifa' }}
+          SITE_COUNTRY: ${{ secrets.SITE_COUNTRY || 'IL' }}
+          CUISINE: ${{ secrets.CUISINE || 'French' }}
+        run: npm run build
+        
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          cname: ${{ secrets.CUSTOM_DOMAIN || '' }}
+          
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-files
+          path: dist/
+          retention-days: 7

@@ -98,6 +98,7 @@ async function build() {
   ]);
 
   console.log(`Found ${events.length} events, ${menus.length} menus, ${packages.length} packages, ${dishes.length} dishes, ${about.length} about records`);
+  console.log("Packages data:", JSON.stringify(packages, null, 2));
 
   const dishMap = Object.fromEntries(dishes.map(d => [d.id, d]));
   const menuMap = Object.fromEntries(
@@ -109,7 +110,7 @@ async function build() {
   );
   const pkgMap = Object.fromEntries(
     packages.map(p => {
-      const slug = p.slug || slugify(p["שם חבילה"] || p.Title || p.Name);
+      const slug = p.slug || slugify(p["שם חבילה (Package Name)"] || p.Title || p.Name);
       return [p.id, { ...p, slug }];
     })
   );
@@ -199,10 +200,30 @@ async function build() {
       </section>
     `;
     
+    // Packages section
+    const packagesSection = `
+      <section class="packages-section" id="packages" style="padding: 100px 40px; background: rgba(255,255,255,0.02); margin: 60px 0;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+          <h2 style="font-size: 3rem; color: var(--fg); text-align: center; margin-bottom: 60px; font-weight: 700;">חבילות האירועים שלנו</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+            ${packages.map(pkg => `
+              <div style="background: var(--card); border-radius: 20px; padding: 30px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
+                <h3 style="font-size: 1.5rem; color: var(--gold); margin-bottom: 15px;">${pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name || "חבילה"}</h3>
+                ${pkg["מחיר (Price)"] || pkg.Price ? `<div style="font-size: 1.2rem; color: var(--fg); margin-bottom: 15px; font-weight: 600;">${money(pkg["מחיר (Price)"] || pkg.Price)}</div>` : ""}
+                ${pkg["תיאור (Description)"] || pkg.Description ? `<p style="color: var(--muted); line-height: 1.6; margin-bottom: 20px;">${pkg["תיאור (Description)"] || pkg.Description}</p>` : ""}
+                ${pkg["תמונה (Image)"] ? `<img src="${Array.isArray(pkg["תמונה (Image)"]) ? pkg["תמונה (Image)"][0].url : pkg["תמונה (Image)"]}" alt="${pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 15px;">` : ""}
+                <a href="/packages/${slugify(pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name || "package")}/" style="display: inline-block; background: var(--gold); color: var(--bg); padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s ease;">לפרטים נוספים</a>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      </section>
+    `;
+    
     const html = layout({
       title: SITE_NAME,
       description: `${SITE_NAME} – אירועים וחוויות קולינריות בחיפה`,
-      body: `${hero}${categoriesSection}${aboutSection}`,
+      body: `${hero}${categoriesSection}${aboutSection}${packagesSection}`,
       url: `${BASE_URL}/`,
       jsonld: {
         "@context": "https://schema.org",
@@ -326,7 +347,7 @@ async function build() {
 
   // packages list
   {
-    const list = Object.values(pkgMap).map(p => card(`/packages/${p.slug}/`, p["שם חבילה"] || p.Title || p.Name, p["מחיר"] ? money(p["מחיר"]) : "", firstImageFrom(p))).join("");
+    const list = Object.values(pkgMap).map(p => card(`/packages/${p.slug}/`, p["שם חבילה (Package Name)"] || p.Title || p.Name, p["מחיר (Price)"] ? money(p["מחיר (Price)"]) : "", firstImageFrom(p))).join("");
     const html = layout({
       title: "חבילות",
       description: "חבילות לאירועים",
@@ -339,13 +360,21 @@ async function build() {
 
   // per-package
   for (const p of Object.values(pkgMap)) {
-    const body = `<article><h1>${p["שם חבילה"] || p.Title || p.Name}</h1>${p["מחיר"] ? `<p class="meta">${money(p["מחיר"])}</p>` : ""}${p["תיאור"] ? `<p>${p["תיאור"]}</p>` : ""}</article>`;
+    const packageImage = p["תמונה (Image)"] ? (Array.isArray(p["תמונה (Image)"]) ? p["תמונה (Image)"][0].url : p["תמונה (Image)"]) : null;
+    const body = `
+      <article>
+        <h1>${p["שם חבילה (Package Name)"] || p.Title || p.Name}</h1>
+        ${p["מחיר (Price)"] ? `<p class="meta" style="font-size: 1.2rem; color: var(--gold); font-weight: 600;">${money(p["מחיר (Price)"])}</p>` : ""}
+        ${packageImage ? `<img src="${packageImage}" alt="${p["שם חבילה (Package Name)"] || p.Title || p.Name}" style="width: 100%; max-width: 500px; height: 300px; object-fit: cover; border-radius: 15px; margin: 20px 0;">` : ""}
+        ${p["תיאור (Description)"] ? `<p style="font-size: 1.1rem; line-height: 1.8; color: var(--fg);">${p["תיאור (Description)"]}</p>` : ""}
+      </article>
+    `;
     const html = layout({
-      title: p["שם חבילה"] || p.Title || p.Name,
-      description: p.SEO_Description || p["תיאור"] || "חבילת אירוע",
+      title: p["שם חבילה (Package Name)"] || p.Title || p.Name,
+      description: p.SEO_Description || p["תיאור (Description)"] || "חבילת אירוע",
       body,
       url: `${BASE_URL}/packages/${p.slug}/`,
-      image: firstImageFrom(p),
+      image: packageImage,
       site
     });
     writeHtml(`/packages/${p.slug}/index.html`, html);
