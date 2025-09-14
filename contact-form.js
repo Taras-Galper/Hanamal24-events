@@ -134,19 +134,50 @@ class ContactFormHandler {
   }
 
   async submitLead(leadData) {
-    // Method 1: Try to submit to a serverless function (if available)
+    // Store the lead locally first
+    this.storeLeadLocally(leadData);
+    
+    // Try serverless function if available
     try {
       await this.submitToServerless(leadData);
       return;
     } catch (error) {
-      console.log('Serverless submission failed, trying alternative methods...');
+      console.log('Serverless submission not available, using email method...');
     }
 
-    // Method 2: Send email via mailto (fallback)
-    this.sendEmailFallback(leadData);
+    // Show success message and provide email option
+    this.showMessage('הבקשה נשמרה בהצלחה! אנא שלחו לנו אימייל עם הפרטים הבאים:', 'success');
+    this.showEmailOption(leadData);
+  }
+
+  async submitToAirtableDirect(leadData) {
+    // Direct submission to Airtable using a public API approach
+    // Note: This requires a public API key or a different approach
     
-    // Method 3: Store in localStorage for manual processing
-    this.storeLeadLocally(leadData);
+    // For now, we'll use a form service that can handle Airtable integration
+    const formData = new FormData();
+    formData.append('name', leadData.fullName);
+    formData.append('email', leadData.email);
+    formData.append('phone', leadData.phone);
+    formData.append('event_type', leadData.eventType);
+    formData.append('guest_count', leadData.guestCount);
+    formData.append('event_date', leadData.eventDate);
+    formData.append('message', leadData.message);
+    formData.append('source', 'website');
+    formData.append('created_at', leadData.createdAt);
+    
+    // Using Formspree or similar service that can forward to Airtable
+    const response = await fetch('https://formspree.io/f/YOUR_FORM_ID', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to submit to form service');
+    }
+
+    console.log('Lead submitted via form service');
+    return await response.json();
   }
 
   async submitToServerless(leadData) {
@@ -167,6 +198,19 @@ class ContactFormHandler {
     const result = await response.json();
     console.log('Lead submitted successfully:', result);
     return result;
+  }
+
+  showEmailOption(leadData) {
+    // Create a button to send email
+    const emailButton = document.createElement('button');
+    emailButton.type = 'button';
+    emailButton.className = 'submit-btn';
+    emailButton.style.marginTop = '10px';
+    emailButton.textContent = 'שלח אימייל עם הפרטים';
+    emailButton.onclick = () => this.sendEmailFallback(leadData);
+    
+    // Add button after the message
+    this.messageContainer.parentNode.insertBefore(emailButton, this.messageContainer.nextSibling);
   }
 
   sendEmailFallback(leadData) {

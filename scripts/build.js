@@ -519,6 +519,87 @@ async function build() {
     writeHtml(`/packages/${p.slug}/index.html`, html);
   }
 
+  // admin page for viewing leads
+  {
+    const adminHtml = layout({
+      title: `Admin - ${SITE_NAME}`,
+      description: "Admin panel for viewing leads",
+      body: `
+        <section class="admin-section">
+          <div class="container">
+            <h1>Admin Panel - Leads Management</h1>
+            <div class="admin-actions">
+              <button onclick="exportLeads()" class="admin-btn">Export Leads</button>
+              <button onclick="clearLeads()" class="admin-btn danger">Clear All Leads</button>
+            </div>
+            <div id="leads-display" class="leads-display">
+              <p>Loading leads...</p>
+            </div>
+          </div>
+        </section>
+        <style>
+          .admin-section { padding: 40px 0; }
+          .admin-actions { margin: 20px 0; }
+          .admin-btn { 
+            background: var(--accent); 
+            color: var(--bg-dark); 
+            border: none; 
+            padding: 10px 20px; 
+            margin: 5px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+          }
+          .admin-btn.danger { background: #ef4444; }
+          .leads-display { margin-top: 20px; }
+          .lead-item { 
+            background: var(--card); 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 8px; 
+            border: 1px solid var(--border);
+          }
+        </style>
+        <script>
+          function loadLeads() {
+            const leads = JSON.parse(localStorage.getItem('hanamal24_leads') || '[]');
+            const display = document.getElementById('leads-display');
+            
+            if (leads.length === 0) {
+              display.innerHTML = '<p>No leads found.</p>';
+              return;
+            }
+            
+            display.innerHTML = leads.map(lead => \`
+              <div class="lead-item">
+                <h3>\${lead.fullName}</h3>
+                <p><strong>Email:</strong> \${lead.email}</p>
+                <p><strong>Phone:</strong> \${lead.phone}</p>
+                <p><strong>Event Type:</strong> \${lead.eventType}</p>
+                <p><strong>Guest Count:</strong> \${lead.guestCount}</p>
+                <p><strong>Event Date:</strong> \${lead.eventDate}</p>
+                <p><strong>Message:</strong> \${lead.message || 'None'}</p>
+                <p><strong>Created:</strong> \${new Date(lead.createdAt).toLocaleString('he-IL')}</p>
+              </div>
+            \`).join('');
+          }
+          
+          function clearLeads() {
+            if (confirm('Are you sure you want to clear all leads?')) {
+              localStorage.removeItem('hanamal24_leads');
+              loadLeads();
+            }
+          }
+          
+          // Load leads on page load
+          document.addEventListener('DOMContentLoaded', loadLeads);
+        </script>
+      `,
+      url: `${BASE_URL}/admin/`,
+      site
+    });
+    writeHtml("/admin/index.html", adminHtml);
+  }
+
   // robots
   writeHtml("/robots.txt", `User-agent: *\nAllow: /\nSitemap: ${BASE_URL}/sitemap.xml\n`);
 
