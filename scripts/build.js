@@ -137,27 +137,47 @@ async function build() {
 
   // home
   {
-    // Get hero data from Airtable
-    const heroData = hero.length > 0 ? hero[0] : null;
-    const heroImage = heroData ? firstImageFrom(heroData) : (normalizedEvents.length > 0 ? firstImageFrom(normalizedEvents[0]) : null);
-    const heroTitle = heroData?.["כותרת ראשית (Main Heading)"] || SITE_NAME;
-    const heroSubtitle = heroData?.["כותרת משנה (Subheading)"] || "חוויה קולינרית ייחודית לאירועים בלתי נשכחים";
-    
-    const heroSection = `
-      <section class="hero">
-        <div class="hero-content">
-          <div class="hero-text">
-            <h1>${heroTitle}</h1>
-            <p>${heroSubtitle}</p>
-            <div class="hero-buttons">
-              <a href="#categories" class="hero-btn-primary">גלה את התפריט</a>
-              <a href="#contact" class="hero-btn-secondary">צור קשר</a>
+    // Get all hero data from Airtable for carousel
+    const activeHeroes = hero.filter(h => h["פעיל (Active)"] !== false);
+    const heroSlides = activeHeroes.map((heroData, index) => {
+      const heroImage = firstImageFrom(heroData);
+      const heroTitle = heroData["כותרת ראשית (Main Heading)"] || SITE_NAME;
+      const heroSubtitle = heroData["כותרת משנה (Subheading)"] || "חוויה קולינרית ייחודית לאירועים בלתי נשכחים";
+      
+      return `
+        <div class="hero-slide ${index === 0 ? 'active' : ''}" data-slide="${index}">
+          <div class="hero-background">
+            ${heroImage ? `<img src="${heroImage}" alt="${heroTitle}" class="hero-bg-image">` : ''}
+            <div class="hero-overlay"></div>
+          </div>
+          <div class="hero-content">
+            <div class="hero-text">
+              <h1>${heroTitle}</h1>
+              <p>${heroSubtitle}</p>
+              <div class="hero-buttons">
+                <a href="#categories" class="hero-btn-primary">גלה את התפריט</a>
+                <a href="#contact" class="hero-btn-secondary">צור קשר</a>
+              </div>
             </div>
           </div>
-          <div class="hero-image">
-            ${heroImage ? `<img src="${heroImage}" alt="${heroTitle}">` : `<div class="hero-placeholder">🍽️</div>`}
-          </div>
         </div>
+      `;
+    }).join('');
+    
+    const heroSection = `
+      <section class="hero-carousel">
+        <div class="hero-slides">
+          ${heroSlides}
+        </div>
+        ${activeHeroes.length > 1 ? `
+          <div class="hero-navigation">
+            <button class="hero-nav prev" aria-label="Previous slide">‹</button>
+            <button class="hero-nav next" aria-label="Next slide">›</button>
+          </div>
+          <div class="hero-dots">
+            ${activeHeroes.map((_, index) => `<button class="hero-dot ${index === 0 ? 'active' : ''}" data-slide="${index}"></button>`).join('')}
+          </div>
+        ` : ''}
       </section>
     `;
     
@@ -405,3 +425,4 @@ async function build() {
 }
 
 await build();
+
