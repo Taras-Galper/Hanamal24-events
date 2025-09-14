@@ -93,7 +93,7 @@ async function build() {
     fetchAll("Events"),
     fetchAll("Menus"),
     fetchAll("tbl9C40JxeIkue5So"), // Correct Packages table ID
-    fetchAll("Dishes"),
+    fetchAll("tblbi9b9lUjRRrAhW"), // Correct Dishes table ID
     fetchAll("tblvhDaSZbzlYP9bh") // Correct About table ID
   ]);
 
