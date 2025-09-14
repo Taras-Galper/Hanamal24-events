@@ -68,7 +68,7 @@ function siteMeta() {
 }
 
 function firstImageFrom(record) {
-  const imgs = record.Image || record.Images || record.Photos || record["Event Photos"];
+  const imgs = record.Image || record.Images || record.Photos || record["Event Photos"] || record["תמונה (Image)"];
   const url = Array.isArray(imgs) ? first(imgs.map(x => x.url || x).filter(Boolean)) : null;
   return url || null;
 }
