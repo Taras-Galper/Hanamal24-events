@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/submit-lead.js": {
+      "maxDuration": 10
+    }
+  },
+  "env": {
+    "AIRTABLE_TOKEN": "@airtable_token"
+  }
+}

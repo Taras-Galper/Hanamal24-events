@@ -292,10 +292,77 @@ async function build() {
       </section>
     `;
     
+    // Contact section
+    const contactSection = `
+      <section id="contact" class="contact">
+        <div class="container">
+          <div class="contact-content">
+            <div class="contact-info">
+              <h2>בואו נתכנן את האירוע שלכם</h2>
+              <p>הצוות המקצועי שלנו כאן לעזור לכם לתכנן את האירוע המושלם. מלאו את הטופס ונחזור אליכם בהקדם.</p>
+              <div class="contact-details">
+                <div class="contact-item">
+                  <strong>טלפון:</strong> 04-8628899
+                </div>
+                <div class="contact-item">
+                  <strong>אימייל:</strong> info@hanamal24.co.il
+                </div>
+                <div class="contact-item">
+                  <strong>כתובת:</strong> רחוב חסן שוקרי 7, חיפה
+                </div>
+              </div>
+            </div>
+            <div class="contact-form-container">
+              <form id="contact-form" class="contact-form">
+                <div class="form-group">
+                  <label for="full-name">שם מלא *</label>
+                  <input type="text" id="full-name" name="fullName" required>
+                </div>
+                <div class="form-group">
+                  <label for="email">אימייל *</label>
+                  <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                  <label for="phone">טלפון *</label>
+                  <input type="tel" id="phone" name="phone" required>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="event-type">סוג אירוע *</label>
+                    <select id="event-type" name="eventType" required>
+                      <option value="">בחר סוג אירוע</option>
+                      <option value="יום הולדת">יום הולדת</option>
+                      <option value="אירוע עסקי">אירוע עסקי</option>
+                      <option value="חתונה">חתונה</option>
+                      <option value="אירוע פרטי">אירוע פרטי</option>
+                      <option value="אחר">אחר</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="guest-count">מספר אורחים *</label>
+                    <input type="number" id="guest-count" name="guestCount" min="1" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="event-date">תאריך האירוע *</label>
+                  <input type="date" id="event-date" name="eventDate" required>
+                </div>
+                <div class="form-group">
+                  <label for="message">הודעה נוספת</label>
+                  <textarea id="message" name="message" rows="4"></textarea>
+                </div>
+                <button type="submit" class="submit-btn">שלח בקשה</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+    `;
+    
     const html = layout({
       title: SITE_NAME,
       description: `${SITE_NAME} – אירועים וחוויות קולינריות בחיפה`,
-      body: `${heroSection}${categoriesSection}${aboutSection}${packagesSection}`,
+      body: `${heroSection}${categoriesSection}${aboutSection}${packagesSection}${contactSection}`,
       url: `${BASE_URL}/`,
       jsonld: {
         "@context": "https://schema.org",
