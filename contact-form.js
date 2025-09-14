@@ -182,14 +182,29 @@ class ContactFormHandler {
   }
 
   async submitToServerless(leadData) {
-    // Try to submit to the serverless function
-    // First try the deployed Vercel function, then fallback to local
-    const urls = [
-      'https://hanamal24-events.vercel.app/api/submit-lead',
-      '/api/submit-lead'
-    ];
+    // Get configuration from config.js
+    const config = window.CONTACT_FORM_CONFIG || {
+      MAKECOM_WEBHOOK: 'https://hook.eu1.make.com/YOUR_WEBHOOK_ID_HERE',
+      VERCEL_FUNCTION: 'https://hanamal24-events.vercel.app/api/submit-lead',
+      LOCAL_FUNCTION: '/api/submit-lead',
+      ENABLE_MAKECOM: true,
+      ENABLE_VERCEL: true,
+      ENABLE_LOCAL: true
+    };
 
-    for (const url of urls) {
+    // Build list of URLs to try based on configuration
+    const webhookUrls = [];
+    if (config.ENABLE_MAKECOM && config.MAKECOM_WEBHOOK !== 'https://hook.eu1.make.com/YOUR_WEBHOOK_ID_HERE') {
+      webhookUrls.push(config.MAKECOM_WEBHOOK);
+    }
+    if (config.ENABLE_VERCEL) {
+      webhookUrls.push(config.VERCEL_FUNCTION);
+    }
+    if (config.ENABLE_LOCAL) {
+      webhookUrls.push(config.LOCAL_FUNCTION);
+    }
+
+    for (const url of webhookUrls) {
       try {
         console.log(`Trying to submit to: ${url}`);
         const response = await fetch(url, {
@@ -202,7 +217,7 @@ class ContactFormHandler {
 
         if (response.ok) {
           const result = await response.json();
-          console.log('Lead submitted successfully to Airtable:', result);
+          console.log('Lead submitted successfully to Airtable via webhook:', result);
           return result;
         } else {
           const errorData = await response.json();
@@ -211,7 +226,7 @@ class ContactFormHandler {
         }
       } catch (error) {
         console.log(`Failed to submit to ${url}:`, error.message);
-        if (url === urls[urls.length - 1]) {
+        if (url === webhookUrls[webhookUrls.length - 1]) {
           // This was the last URL, re-throw the error
           throw error;
         }
