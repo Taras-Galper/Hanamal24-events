@@ -19,7 +19,7 @@ export function layout({ title, description, body, url, image, jsonld, site }) {
 <meta property="og:url" content="${canonical}">
 <meta property="og:image" content="${ogImage}">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="styles.css">
 ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script>` : ""}
 </head>
 <body>
