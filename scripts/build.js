@@ -373,12 +373,16 @@ async function build() {
     `;
     
     // Gallery section
+    const activeGalleryItems = finalGallery.filter(item => item["פעיל (Active)"] !== false);
+    const totalImages = activeGalleryItems.length;
+    const initialImages = 6;
+    
     const gallerySection = `
       <section class="gallery-section" id="gallery">
         <div class="gallery-container">
           <h2 class="gallery-title">גלריית תמונות</h2>
-          <div class="gallery-grid">
-            ${finalGallery.filter(item => item["פעיל (Active)"] !== false).map(item => {
+          <div class="gallery-grid" id="gallery-grid">
+            ${activeGalleryItems.slice(0, initialImages).map(item => {
               const imageUrl = firstImageFrom(item);
               const title = item["כותרת (Title)"] || item.Title || item.Name || "תמונה";
               const description = item["תיאור (Description)"] || item.Description || "";
@@ -397,6 +401,14 @@ async function build() {
               `;
             }).join("")}
           </div>
+          ${totalImages > initialImages ? `
+            <div class="gallery-actions">
+              <button class="gallery-view-more-btn" onclick="loadMoreGalleryImages()">
+                <span class="btn-text">צפה בעוד תמונות</span>
+                <span class="btn-count">(${totalImages - initialImages} נוספות)</span>
+              </button>
+            </div>
+          ` : ""}
         </div>
       </section>
     `;
@@ -547,14 +559,15 @@ async function build() {
       },
       site
     });
-    // Add package and dish data for JavaScript
-    const packageDataScript = `
-      <script>
-        window.PACKAGE_DATA = ${JSON.stringify(finalPackages)};
-        window.DISH_DATA = ${JSON.stringify(dishes)};
-        window.PACKAGE_DISH_MAP = ${JSON.stringify(packageDishMap)};
-      </script>
-    `;
+      // Add package and dish data for JavaScript
+      const packageDataScript = `
+        <script>
+          window.PACKAGE_DATA = ${JSON.stringify(finalPackages)};
+          window.DISH_DATA = ${JSON.stringify(dishes)};
+          window.PACKAGE_DISH_MAP = ${JSON.stringify(packageDishMap)};
+          window.GALLERY_DATA = ${JSON.stringify(activeGalleryItems)};
+        </script>
+      `;
     
     const htmlWithData = html.replace('</body>', `${packageDataScript}</body>`);
     writeHtml("/index.html", htmlWithData);
