@@ -180,15 +180,29 @@ async function build() {
 
   // Create package-dish relationships
   const packageDishMap = {};
+  
+  // First, create a map of package IDs to package names
+  const packageIdToName = {};
+  finalPackages.forEach(pkg => {
+    const packageName = pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name;
+    if (pkg.id) {
+      packageIdToName[pkg.id] = packageName;
+    }
+  });
+  
   dishes.forEach(dish => {
-    const packageField = dish["חבילה (Package)"] || dish["Package"] || dish["Package Assignment"];
+    const packageField = dish["חבילות (Packages)"] || dish["חבילה (Package)"] || dish["Package"] || dish["Package Assignment"];
+    
     if (packageField) {
-      const packageNames = Array.isArray(packageField) ? packageField : [packageField];
-      packageNames.forEach(pkgName => {
-        if (!packageDishMap[pkgName]) {
-          packageDishMap[pkgName] = [];
+      const packageIds = Array.isArray(packageField) ? packageField : [packageField];
+      packageIds.forEach(pkgId => {
+        const packageName = packageIdToName[pkgId];
+        if (packageName) {
+          if (!packageDishMap[packageName]) {
+            packageDishMap[packageName] = [];
+          }
+          packageDishMap[packageName].push(dish);
         }
-        packageDishMap[pkgName].push(dish);
       });
     }
   });
