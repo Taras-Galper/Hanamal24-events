@@ -164,7 +164,7 @@ class PackageModalHandler {
     return `
       <div class="package-menu-item">
         ${imageUrl ? `<div class="dish-image-container">
-          <img src="${imageUrl}" alt="${name}" class="dish-image" onerror="this.style.display='none'">
+          <img src="${imageUrl}" alt="${name}" class="dish-image" onerror="this.classList.add('hidden')">
         </div>` : ""}
         <div class="dish-content">
           <h4>${name}</h4>

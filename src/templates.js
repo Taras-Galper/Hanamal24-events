@@ -55,6 +55,6 @@ ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script
 }
 
 export function card(href, title, meta, img) {
-  const pic = img ? `<div class="event-image"><img loading="lazy" src="${img}" alt="" onerror="this.style.display='none'; this.nextElementSibling.classList.add('show');"><div class="image-placeholder">📷</div></div>` : "";
+  const pic = img ? `<div class="event-image"><img loading="lazy" src="${img}" alt="" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.add('show');"><div class="image-placeholder">📷</div></div>` : "";
   return `<a class="event-card" href="${href}">${pic}<div class="event-content"><h3>${escapeHtml(title)}</h3><div class="event-date">${meta ? escapeHtml(meta) : ""}</div><div class="event-link">לפרטים נוספים →</div></div></a>`;
 }
