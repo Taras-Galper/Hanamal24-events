@@ -134,7 +134,22 @@ class ContactFormHandler {
   }
 
   async submitLead(leadData) {
-    // Try to submit to Airtable via serverless function first
+    // Check if any webhook is configured
+    const config = window.CONTACT_FORM_CONFIG || {};
+    const hasConfiguredWebhook = config.ENABLE_MAKECOM && 
+      config.MAKECOM_WEBHOOK && 
+      config.MAKECOM_WEBHOOK !== 'https://hook.eu1.make.com/YOUR_WEBHOOK_ID_HERE';
+
+    if (!hasConfiguredWebhook) {
+      // No webhook configured, store locally and show instructions
+      this.storeLeadLocally(leadData);
+      this.showMessage('הבקשה נשמרה בהצלחה! אנא שלחו לנו אימייל עם הפרטים הבאים:', 'success');
+      this.showEmailOption(leadData);
+      this.showSetupInstructions();
+      return;
+    }
+
+    // Try to submit to Airtable via webhook
     try {
       await this.submitToServerless(leadData);
       // If successful, show success message and return
@@ -142,7 +157,7 @@ class ContactFormHandler {
       this.form.reset();
       return;
     } catch (error) {
-      console.log('Serverless submission failed, storing locally and showing email option...');
+      console.log('Webhook submission failed, storing locally and showing email option...');
     }
 
     // Fallback: Store locally and show email option
@@ -246,6 +261,39 @@ class ContactFormHandler {
     
     // Add button after the message
     this.messageContainer.parentNode.insertBefore(emailButton, this.messageContainer.nextSibling);
+  }
+
+  showSetupInstructions() {
+    // Create setup instructions
+    const instructionsDiv = document.createElement('div');
+    instructionsDiv.className = 'setup-instructions';
+    instructionsDiv.style.cssText = `
+      background: #1a1a1a;
+      border: 2px solid #d4af37;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+      color: #ffffff;
+      font-size: 14px;
+      line-height: 1.6;
+    `;
+    
+    instructionsDiv.innerHTML = `
+      <h4 style="color: #d4af37; margin-bottom: 15px;">🔧 Setup Instructions for Automatic Airtable Submission</h4>
+      <p><strong>Current Status:</strong> Contact form is working but leads are stored locally only.</p>
+      <p><strong>To enable automatic Airtable submission:</strong></p>
+      <ol style="margin: 10px 0; padding-right: 20px;">
+        <li>Set up Make.com webhook (see MAKECOM_SETUP_GUIDE.md)</li>
+        <li>Get your webhook URL from Make.com</li>
+        <li>Update public/config.js with your webhook URL</li>
+        <li>Change ENABLE_MAKECOM to true</li>
+        <li>Rebuild and deploy the site</li>
+      </ol>
+      <p><strong>Alternative:</strong> Check /admin/ page to view and export stored leads manually.</p>
+    `;
+    
+    // Add instructions after the message
+    this.messageContainer.parentNode.insertBefore(instructionsDiv, this.messageContainer.nextSibling);
   }
 
   sendEmailFallback(leadData) {
