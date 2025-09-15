@@ -231,13 +231,32 @@ class ContactFormHandler {
         });
 
         if (response.ok) {
-          const result = await response.json();
+          // Try to parse as JSON, but handle non-JSON responses
+          let result;
+          try {
+            const text = await response.text();
+            if (text.trim()) {
+              result = JSON.parse(text);
+            } else {
+              result = { success: true, message: 'Lead submitted successfully' };
+            }
+          } catch (parseError) {
+            // If response is not JSON (like "Accepted"), treat as success
+            result = { success: true, message: 'Lead submitted successfully' };
+          }
           console.log('Lead submitted successfully to Airtable via webhook:', result);
           return result;
         } else {
-          const errorData = await response.json();
-          console.log(`Error from ${url}:`, errorData);
-          throw new Error(errorData.message || `HTTP ${response.status}`);
+          let errorMessage;
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || `HTTP ${response.status}`;
+          } catch (parseError) {
+            const errorText = await response.text();
+            errorMessage = errorText || `HTTP ${response.status}`;
+          }
+          console.log(`Error from ${url}:`, errorMessage);
+          throw new Error(errorMessage);
         }
       } catch (error) {
         console.log(`Failed to submit to ${url}:`, error.message);

@@ -5,7 +5,7 @@ const CONFIG = {
   // Make.com webhook URL (recommended)
   // Get this from your Make.com scenario webhook module
   // Replace with your actual Make.com webhook URL
-  MAKECOM_WEBHOOK: 'https://hook.eu1.make.com/YOUR_WEBHOOK_ID_HERE',
+  MAKECOM_WEBHOOK: 'https://hook.eu2.make.com/9n1kj2shagj3sorar6ucb084higb1vpf',
   
   // Vercel serverless function (fallback)
   VERCEL_FUNCTION: 'https://hanamal24-events.vercel.app/api/submit-lead',
@@ -14,7 +14,7 @@ const CONFIG = {
   LOCAL_FUNCTION: '/api/submit-lead',
   
   // Enable/disable different submission methods
-  ENABLE_MAKECOM: false, // Disabled until Make.com webhook is configured
+  ENABLE_MAKECOM: true,  // ✅ ENABLED - Make.com webhook configured
   ENABLE_VERCEL: false,  // Disabled due to CORS issues
   ENABLE_LOCAL: false    // Disabled - GitHub Pages doesn't support POST
 };

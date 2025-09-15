@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Make.com Webhook</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #d4af37;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d4af37;
+            border-radius: 5px;
+            background: #2a2a2a;
+            color: #ffffff;
+        }
+        button {
+            background: #d4af37;
+            color: #000;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background: #2a2a2a;
+        }
+        .success { border: 2px solid #10b981; }
+        .error { border: 2px solid #ef4444; }
+    </style>
+</head>
+<body>
+    <h1>Test Make.com Webhook</h1>
+    <p>Enter your Make.com webhook URL and test the connection:</p>
+    
+    <div class="form-group">
+        <label for="webhook-url">Make.com Webhook URL:</label>
+        <input type="url" id="webhook-url" placeholder="https://hook.eu1.make.com/xxxxxxxxx">
+    </div>
+    
+    <div class="form-group">
+        <label for="test-name">Test Name:</label>
+        <input type="text" id="test-name" value="Test User">
+    </div>
+    
+    <div class="form-group">
+        <label for="test-email">Test Email:</label>
+        <input type="email" id="test-email" value="test@example.com">
+    </div>
+    
+    <button onclick="testWebhook()">Test Webhook</button>
+    
+    <div id="result" class="result" style="display: none;"></div>
+
+    <script>
+        async function testWebhook() {
+            const webhookUrl = document.getElementById('webhook-url').value;
+            const testName = document.getElementById('test-name').value;
+            const testEmail = document.getElementById('test-email').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!webhookUrl) {
+                showResult('Please enter your Make.com webhook URL', 'error');
+                return;
+            }
+            
+            const testData = {
+                fullName: testName,
+                email: testEmail,
+                phone: '+1234567890',
+                eventType: 'יום הולדת',
+                guestCount: 25,
+                eventDate: '2024-02-15',
+                message: 'Test message from webhook tester'
+            };
+            
+            try {
+                showResult('Sending test data...', '');
+                
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                if (response.ok) {
+                    // Handle both JSON and non-JSON responses
+                    let result;
+                    try {
+                        const text = await response.text();
+                        if (text.trim()) {
+                            result = JSON.parse(text);
+                        } else {
+                            result = { success: true, message: 'Accepted' };
+                        }
+                    } catch (parseError) {
+                        result = { success: true, message: 'Accepted (non-JSON response)' };
+                    }
+                    showResult(`✅ Success! Webhook is working. Response: ${JSON.stringify(result)}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    showResult(`❌ Error ${response.status}: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Network Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = message;
+            resultDiv.className = `result ${type}`;
+        }
+    </script>
+</body>
+</html>
