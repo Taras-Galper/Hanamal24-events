@@ -19,9 +19,11 @@ const SITE_CITY      = process.env.SITE_CITY || "Haifa";
 const SITE_COUNTRY   = process.env.SITE_COUNTRY || "IL";
 const CUISINE        = process.env.CUISINE || "Mediterranean";
 
-if (!AIRTABLE_TOKEN || !AIRTABLE_BASE) {
-  console.error("Missing AIRTABLE_TOKEN or AIRTABLE_BASE env vars");
-  process.exit(1);
+// Check if Airtable credentials are available
+const hasAirtableCredentials = AIRTABLE_TOKEN && AIRTABLE_BASE;
+if (!hasAirtableCredentials) {
+  console.warn("⚠️  AIRTABLE_TOKEN or AIRTABLE_BASE not found - building with static content only");
+  console.warn("   To enable Airtable integration, set these environment variables");
 }
 
 const outDir = path.join(__dirname, "..", "dist");
@@ -36,6 +38,11 @@ function copyStatic() {
 }
 
 async function fetchAll(table, view = "Grid view") {
+  if (!hasAirtableCredentials) {
+    console.log(`Skipping ${table} - no Airtable credentials available`);
+    return [];
+  }
+  
   const headers = { Authorization: `Bearer ${AIRTABLE_TOKEN}` };
   const base = `https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(table)}`;
   let records = [];
@@ -108,7 +115,12 @@ async function build() {
   if (fs.existsSync(outDir)) fs.rmSync(outDir, { recursive: true, force: true });
   copyStatic();
 
-  console.log("Fetching data from Airtable...");
+  if (hasAirtableCredentials) {
+    console.log("Fetching data from Airtable...");
+  } else {
+    console.log("Using static fallback content (no Airtable credentials)");
+  }
+  
   const [events, menus, packages, dishes, about, hero] = await Promise.all([
     fetchAll("Events"),
     fetchAll("Menus"),
@@ -119,7 +131,39 @@ async function build() {
   ]);
 
   console.log(`Found ${events.length} events, ${menus.length} menus, ${packages.length} packages, ${dishes.length} dishes, ${about.length} about records, ${hero.length} hero records`);
-  console.log("Hero data:", JSON.stringify(hero, null, 2));
+  
+  // Add fallback content if no Airtable data
+  const fallbackHero = [{
+    "כותרת ראשית (Main Heading)": SITE_NAME,
+    "כותרת משנה (Subheading)": "חוויה קולינרית ייחודית לאירועים בלתי נשכחים",
+    "פעיל (Active)": true
+  }];
+  
+  const fallbackAbout = [{
+    "כותרת (Title)": "אודות הנמל 24",
+    "תוכן (Content)": "מסעדת הנמל 24 מציעה חוויה קולינרית ייחודית עם מטבח צרפתי איכותי. אנו מתמחים באירועים פרטיים, חתונות, ימי הולדת ואירועים עסקיים. הצוות המקצועי שלנו מבטיח שכל אירוע יהיה בלתי נשכח.",
+    "פעיל (Active)": true
+  }];
+  
+  const fallbackPackages = [
+    {
+      "שם חבילה (Package Name)": "חבילת VIP",
+      "תיאור (Description)": "חבילה יוקרתית הכוללת תפריט מלא, שירות ברמה גבוהה וכל הפרטים הקטנים",
+      "מחיר (Price)": "₪500-800 לאדם",
+      "פעיל (Active)": true
+    },
+    {
+      "שם חבילה (Package Name)": "חבילת סטנדרט",
+      "תיאור (Description)": "חבילה איכותית עם תפריט מגוון ושירות מקצועי",
+      "מחיר (Price)": "₪300-500 לאדם",
+      "פעיל (Active)": true
+    }
+  ];
+  
+  // Use fallback data if no Airtable data available
+  const finalHero = hero.length > 0 ? hero : fallbackHero;
+  const finalAbout = about.length > 0 ? about : fallbackAbout;
+  const finalPackages = packages.length > 0 ? packages : fallbackPackages;
 
   const dishMap = Object.fromEntries(dishes.map(d => [d.id, d]));
   const menuMap = Object.fromEntries(
@@ -130,9 +174,9 @@ async function build() {
     })
   );
   const pkgMap = Object.fromEntries(
-    packages.map((p, index) => {
+    finalPackages.map((p, index) => {
       const slug = p.slug || slugify(p["שם חבילה (Package Name)"] || p.Title || p.Name) || `package-${index + 1}`;
-      return [p.id, { ...p, slug }];
+      return [p.id || `fallback-${index}`, { ...p, slug }];
     })
   );
 
@@ -158,7 +202,7 @@ async function build() {
   // home
   {
     // Get all hero data from Airtable for carousel
-    const activeHeroes = hero.filter(h => h["פעיל (Active)"] !== false);
+    const activeHeroes = finalHero.filter(h => h["פעיל (Active)"] !== false);
     const heroSlides = activeHeroes.map((heroData, index) => {
       const heroImage = firstImageFrom(heroData);
       const heroVideo = firstVideoFrom(heroData);
@@ -251,7 +295,7 @@ async function build() {
     `;
     
     // About section - use Airtable data if available, otherwise fallback
-    const aboutData = about.length > 0 ? about[0] : null;
+    const aboutData = finalAbout.length > 0 ? finalAbout[0] : null;
     const aboutSection = `
       <section class="about-section" id="about">
         <div class="about-container">
@@ -278,7 +322,7 @@ async function build() {
         <div class="packages-container">
           <h2 class="packages-title">חבילות האירועים שלנו</h2>
           <div class="packages-grid">
-            ${packages.map(pkg => `
+            ${finalPackages.map(pkg => `
               <div class="package-card">
                 <h3 class="package-title">${pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name || "חבילה"}</h3>
                 ${pkg["מחיר (Price)"] || pkg.Price ? `<div class="package-price">${money(pkg["מחיר (Price)"] || pkg.Price)}</div>` : ""}
