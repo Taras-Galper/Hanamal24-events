@@ -8,8 +8,17 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-    # Optional: Add Airtable environment variables if you want live data
-    # - key: AIRTABLE_TOKEN
-    #   value: your_airtable_token_here
-    # - key: AIRTABLE_BASE
-    #   value: your_airtable_base_id_here
+      - key: AIRTABLE_TOKEN
+        value: patfEh10eMje6sACP.b76a7392aee5a154df6fa1910991097e2eeb0f61984daff39ac15d4f0d4a1ec6
+      - key: AIRTABLE_BASE
+        value: appeW41fJAbVdeWoU
+      - key: BASE_URL
+        value: https://hanamal24-events.onrender.com
+      - key: SITE_NAME
+        value: Hanamal 24
+      - key: SITE_CITY
+        value: Haifa
+      - key: SITE_COUNTRY
+        value: IL
+      - key: CUISINE
+        value: French
