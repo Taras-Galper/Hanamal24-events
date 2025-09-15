@@ -125,16 +125,17 @@ async function build() {
     console.log("Using static fallback content (no Airtable credentials)");
   }
   
-  const [events, menus, packages, dishes, about, hero] = await Promise.all([
+  const [events, menus, packages, dishes, about, hero, gallery] = await Promise.all([
     fetchAll("Events"),
     fetchAll("Menus"),
     fetchAll("tbl9C40JxeIkue5So"), // Correct Packages table ID
     fetchAll("tblbi9b9lUjRRrAhW"), // Correct Dishes table ID
     fetchAll("tblvhDaSZbzlYP9bh"), // Correct About table ID
-    fetchAll("tblOe7ONKtB6A9Q6L") // Hero table ID
+    fetchAll("tblOe7ONKtB6A9Q6L"), // Hero table ID
+    fetchAll("tblpfVJY9nEb5JDlQ") // Gallery table ID
   ]);
 
-  console.log(`Found ${events.length} events, ${menus.length} menus, ${packages.length} packages, ${dishes.length} dishes, ${about.length} about records, ${hero.length} hero records`);
+  console.log(`Found ${events.length} events, ${menus.length} menus, ${packages.length} packages, ${dishes.length} dishes, ${about.length} about records, ${hero.length} hero records, ${gallery.length} gallery items`);
   
   // Add fallback content if no Airtable data
   const fallbackHero = [{
@@ -164,10 +165,32 @@ async function build() {
     }
   ];
   
+  const fallbackGallery = [
+    {
+      "תמונה (Image)": "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&h=600&fit=crop",
+      "כותרת (Title)": "חלל המסעדה",
+      "תיאור (Description)": "אווירה חמה ומזמינה",
+      "פעיל (Active)": true
+    },
+    {
+      "תמונה (Image)": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop",
+      "כותרת (Title)": "מנות גורמה",
+      "תיאור (Description)": "מנות איכותיות וטעימות",
+      "פעיל (Active)": true
+    },
+    {
+      "תמונה (Image)": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop",
+      "כותרת (Title)": "אירועים מיוחדים",
+      "תיאור (Description)": "חוויות בלתי נשכחות",
+      "פעיל (Active)": true
+    }
+  ];
+  
   // Use fallback data if no Airtable data available
   const finalHero = hero.length > 0 ? hero : fallbackHero;
   const finalAbout = about.length > 0 ? about : fallbackAbout;
   const finalPackages = packages.length > 0 ? packages : fallbackPackages;
+  const finalGallery = gallery.length > 0 ? gallery : fallbackGallery;
 
   const dishMap = Object.fromEntries(dishes.map(d => [d.id, d]));
   const menuMap = Object.fromEntries(
@@ -349,6 +372,35 @@ async function build() {
       </section>
     `;
     
+    // Gallery section
+    const gallerySection = `
+      <section class="gallery-section" id="gallery">
+        <div class="gallery-container">
+          <h2 class="gallery-title">גלריית תמונות</h2>
+          <div class="gallery-grid">
+            ${finalGallery.filter(item => item["פעיל (Active)"] !== false).map(item => {
+              const imageUrl = firstImageFrom(item);
+              const title = item["כותרת (Title)"] || item.Title || item.Name || "תמונה";
+              const description = item["תיאור (Description)"] || item.Description || "";
+              
+              return `
+                <div class="gallery-item">
+                  <div class="gallery-image-container">
+                    <img src="${imageUrl}" alt="${title}" class="gallery-image" loading="lazy" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.add('show');">
+                    <div class="image-placeholder">📷</div>
+                  </div>
+                  <div class="gallery-content">
+                    <h3 class="gallery-item-title">${title}</h3>
+                    ${description ? `<p class="gallery-item-description">${description}</p>` : ""}
+                  </div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </div>
+      </section>
+    `;
+    
     // Packages section
     const packagesSection = `
       <section class="packages-section" id="packages">
@@ -469,7 +521,7 @@ async function build() {
     const html = layout({
       title: SITE_NAME,
       description: `${SITE_NAME} – אירועים וחוויות קולינריות בחיפה`,
-      body: `${heroSection}${categoriesSection}${aboutSection}${packagesSection}${contactSection}${packageModal}`,
+      body: `${heroSection}${categoriesSection}${aboutSection}${gallerySection}${packagesSection}${contactSection}${packageModal}`,
       url: `${BASE_URL}/`,
       jsonld: {
         "@context": "https://schema.org",
