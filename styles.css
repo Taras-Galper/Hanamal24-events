@@ -869,10 +869,13 @@ main {
 }
 
 .contact-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 60px;
-  align-items: start;
+  align-items: center;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .contact-info h2 {
@@ -893,16 +896,21 @@ main {
   display: flex;
   flex-direction: column;
   gap: 15px;
+  align-items: center;
 }
 
 .contact-item {
   color: var(--fg);
   font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .contact-item strong {
   color: var(--accent);
   margin-left: 10px;
+  min-width: 80px;
 }
 
 .contact-form-container {
@@ -910,6 +918,8 @@ main {
   padding: 40px;
   border-radius: 12px;
   border: 1px solid rgba(212, 175, 55, 0.2);
+  width: 100%;
+  max-width: 600px;
 }
 
 .contact-form {
@@ -1264,9 +1274,9 @@ footer p {
   }
   
   .contact-content {
-    grid-template-columns: 1fr;
     gap: 40px;
     padding: 0 20px;
+    max-width: 100%;
   }
   
   .contact-info h2 {
