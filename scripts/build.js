@@ -221,7 +221,7 @@ async function build() {
             <button class="hero-nav next" aria-label="Next slide">›</button>
           </div>
           <div class="hero-dots">
-            ${activeHeroes.map((_, index) => `<button class="hero-dot ${index === 0 ? 'active' : ''}" data-slide="${index}"></button>`).join('')}
+            ${activeHeroes.map((_, index) => `<button class="hero-dot ${index === 0 ? 'active' : ''}" data-slide="${index}" aria-label="Go to slide ${index + 1}"></button>`).join('')}
           </div>
         ` : ''}
       </section>
