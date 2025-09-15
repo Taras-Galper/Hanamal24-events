@@ -384,7 +384,7 @@ async function build() {
               const description = item["תיאור (Description)"] || item.Description || "";
               
               return `
-                <div class="gallery-item">
+                <div class="gallery-item" onclick="openGalleryModal('${imageUrl}', '${title.replace(/'/g, "\\'")}', '${description.replace(/'/g, "\\'")}')">
                   <div class="gallery-image-container">
                     <img src="${imageUrl}" alt="${title}" class="gallery-image" loading="lazy" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.add('show');">
                     <div class="image-placeholder">📷</div>
@@ -517,11 +517,25 @@ async function build() {
         </div>
       </div>
     `;
+    
+    // Gallery modal HTML
+    const galleryModal = `
+      <div id="gallery-modal" class="gallery-modal" style="display: none;">
+        <div class="gallery-modal-content">
+          <button class="gallery-modal-close" onclick="closeGalleryModal()">&times;</button>
+          <img id="gallery-modal-image" class="gallery-modal-image" src="" alt="">
+          <div class="gallery-modal-info">
+            <h3 id="gallery-modal-title" class="gallery-modal-title"></h3>
+            <p id="gallery-modal-description" class="gallery-modal-description"></p>
+          </div>
+        </div>
+      </div>
+    `;
 
     const html = layout({
       title: SITE_NAME,
       description: `${SITE_NAME} – אירועים וחוויות קולינריות בחיפה`,
-      body: `${heroSection}${categoriesSection}${aboutSection}${gallerySection}${packagesSection}${contactSection}${packageModal}`,
+      body: `${heroSection}${categoriesSection}${aboutSection}${gallerySection}${packagesSection}${contactSection}${packageModal}${galleryModal}`,
       url: `${BASE_URL}/`,
       jsonld: {
         "@context": "https://schema.org",

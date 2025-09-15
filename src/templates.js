@@ -24,6 +24,7 @@ export function layout({ title, description, body, url, image, jsonld, site }) {
 <script src="hero-carousel.js" defer></script>
 <script src="contact-form.js" defer></script>
 <script src="package-modal.js" defer></script>
+<script src="gallery-modal.js" defer></script>
 ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script>` : ""}
 </head>
 <body>
