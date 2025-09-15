@@ -1402,10 +1402,14 @@ footer p {
 /* Responsive Design */
 @media (max-width: 768px) {
   /* Header */
+  .header {
+    padding: 15px 0;
+  }
+  
   .header-content {
     padding: 0 15px;
     flex-direction: column;
-    gap: 15px;
+    gap: 8px;
   }
   
   .header-left, .header-center, .header-right {
@@ -1414,14 +1418,14 @@ footer p {
   }
   
   .nav {
-    gap: 15px;
+    gap: 8px;
     flex-wrap: wrap;
     justify-content: center;
   }
   
   .nav a {
-    font-size: 0.9rem;
-    padding: 8px 12px;
+    font-size: 0.8rem;
+    padding: 6px 8px;
   }
   
   .brand {
@@ -1679,12 +1683,12 @@ footer p {
   }
   
   .nav {
-    gap: 10px;
+    gap: 6px;
   }
   
   .nav a {
-    font-size: 0.85rem;
-    padding: 6px 10px;
+    font-size: 0.75rem;
+    padding: 4px 6px;
   }
   
   .hero-text h1 {
