@@ -1049,8 +1049,11 @@ main {
 /* Responsive design for contact form */
 @media (max-width: 768px) {
   .contact-content {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 40px;
+    align-items: center;
+    text-align: center;
   }
   
   .form-row {
@@ -1277,6 +1280,10 @@ footer p {
     gap: 40px;
     padding: 0 20px;
     max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
   
   .contact-info h2 {
