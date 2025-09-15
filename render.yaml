@@ -1,0 +1,15 @@
+# render.yaml - Render.com configuration
+services:
+  - type: web
+    name: hanamal24-events
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+    # Optional: Add Airtable environment variables if you want live data
+    # - key: AIRTABLE_TOKEN
+    #   value: your_airtable_token_here
+    # - key: AIRTABLE_BASE
+    #   value: your_airtable_base_id_here
