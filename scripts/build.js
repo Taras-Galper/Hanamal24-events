@@ -177,6 +177,21 @@ async function build() {
       return [m.id, { ...m, slug, items }];
     })
   );
+
+  // Create package-dish relationships
+  const packageDishMap = {};
+  dishes.forEach(dish => {
+    const packageField = dish["חבילה (Package)"] || dish["Package"] || dish["Package Assignment"];
+    if (packageField) {
+      const packageNames = Array.isArray(packageField) ? packageField : [packageField];
+      packageNames.forEach(pkgName => {
+        if (!packageDishMap[pkgName]) {
+          packageDishMap[pkgName] = [];
+        }
+        packageDishMap[pkgName].push(dish);
+      });
+    }
+  });
   const pkgMap = Object.fromEntries(
     finalPackages.map((p, index) => {
       const slug = p.slug || slugify(p["שם חבילה (Package Name)"] || p.Title || p.Name) || `package-${index + 1}`;
@@ -326,13 +341,13 @@ async function build() {
         <div class="packages-container">
           <h2 class="packages-title">חבילות האירועים שלנו</h2>
           <div class="packages-grid">
-            ${finalPackages.map(pkg => `
-              <div class="package-card">
+            ${finalPackages.map((pkg, index) => `
+              <div class="package-card" data-package-id="${pkg.id || `package-${index}`}" onclick="openPackageModal('${pkg.id || `package-${index}`}')">
                 <h3 class="package-title">${pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name || "חבילה"}</h3>
                 ${pkg["מחיר (Price)"] || pkg.Price ? `<div class="package-price">${money(pkg["מחיר (Price)"] || pkg.Price)}</div>` : ""}
                 ${pkg["תיאור (Description)"] || pkg.Description ? `<p class="package-description">${pkg["תיאור (Description)"] || pkg.Description}</p>` : ""}
                 ${pkg["תמונה (Image)"] ? `<img src="${Array.isArray(pkg["תמונה (Image)"]) ? pkg["תמונה (Image)"][0].url : pkg["תמונה (Image)"]}" alt="${pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name}" class="package-image">` : ""}
-                <a href="/packages/${slugify(pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name || "package")}/" class="package-link">לפרטים נוספים</a>
+                <button class="package-link" onclick="event.stopPropagation(); openPackageModal('${pkg.id || `package-${index}`}')">לפרטים נוספים</button>
               </div>
             `).join("")}
           </div>
@@ -406,10 +421,41 @@ async function build() {
       </section>
     `;
     
+    // Package modal HTML
+    const packageModal = `
+      <div id="package-modal" class="package-modal" style="display: none;">
+        <div class="package-modal-overlay" onclick="closePackageModal()"></div>
+        <div class="package-modal-content">
+          <button class="package-modal-close" onclick="closePackageModal()">&times;</button>
+          <div class="package-modal-header">
+            <h2 id="modal-package-title"></h2>
+            <div id="modal-package-price" class="modal-package-price"></div>
+          </div>
+          <div class="package-modal-body">
+            <div class="package-modal-section">
+              <h3>תיאור החבילה</h3>
+              <p id="modal-package-description"></p>
+            </div>
+            <div class="package-modal-section">
+              <h3>יתרונות החבילה</h3>
+              <ul id="modal-package-benefits"></ul>
+            </div>
+            <div class="package-modal-section">
+              <h3>תפריט החבילה</h3>
+              <div id="modal-package-menu" class="package-menu-grid"></div>
+            </div>
+          </div>
+          <div class="package-modal-footer">
+            <button class="package-modal-cta" onclick="scrollToContact()">הזמן עכשיו</button>
+          </div>
+        </div>
+      </div>
+    `;
+
     const html = layout({
       title: SITE_NAME,
       description: `${SITE_NAME} – אירועים וחוויות קולינריות בחיפה`,
-      body: `${heroSection}${categoriesSection}${aboutSection}${packagesSection}${contactSection}`,
+      body: `${heroSection}${categoriesSection}${aboutSection}${packagesSection}${contactSection}${packageModal}`,
       url: `${BASE_URL}/`,
       jsonld: {
         "@context": "https://schema.org",
@@ -421,7 +467,17 @@ async function build() {
       },
       site
     });
-    writeHtml("/index.html", html);
+    // Add package and dish data for JavaScript
+    const packageDataScript = `
+      <script>
+        window.PACKAGE_DATA = ${JSON.stringify(finalPackages)};
+        window.DISH_DATA = ${JSON.stringify(dishes)};
+        window.PACKAGE_DISH_MAP = ${JSON.stringify(packageDishMap)};
+      </script>
+    `;
+    
+    const htmlWithData = html.replace('</body>', `${packageDataScript}</body>`);
+    writeHtml("/index.html", htmlWithData);
   }
 
   // events list (now categories)

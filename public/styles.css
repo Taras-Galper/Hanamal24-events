@@ -479,6 +479,14 @@ main {
   padding: 30px;
   text-align: center;
   border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.package-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(212, 175, 55, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .package-title {
@@ -517,11 +525,224 @@ main {
   text-decoration: none;
   font-weight: 600;
   transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
 }
 
 .package-link:hover {
   background: #d4af37;
   transform: translateY(-2px);
+}
+
+/* Package Modal */
+.package-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.package-modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+}
+
+.package-modal-content {
+  position: relative;
+  background: var(--card);
+  border-radius: 20px;
+  max-width: 800px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.package-modal-close {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: var(--fg);
+  cursor: pointer;
+  z-index: 1001;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.package-modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--accent);
+}
+
+.package-modal-header {
+  padding: 40px 40px 20px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.package-modal-header h2 {
+  font-size: 2.5rem;
+  color: var(--accent);
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.modal-package-price {
+  font-size: 1.5rem;
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.package-modal-body {
+  padding: 30px 40px;
+}
+
+.package-modal-section {
+  margin-bottom: 30px;
+}
+
+.package-modal-section h3 {
+  font-size: 1.5rem;
+  color: var(--accent);
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.package-modal-section p {
+  color: var(--fg);
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
+.package-modal-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.package-modal-section li {
+  color: var(--fg);
+  padding: 8px 0;
+  padding-right: 20px;
+  position: relative;
+}
+
+.package-modal-section li:before {
+  content: "✓";
+  position: absolute;
+  right: 0;
+  color: var(--accent);
+  font-weight: bold;
+}
+
+.package-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.package-menu-item {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.package-menu-item h4 {
+  color: var(--accent);
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
+
+.package-menu-item p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.package-menu-item .price {
+  color: var(--gold);
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.package-modal-footer {
+  padding: 20px 40px 40px;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.package-modal-cta {
+  background: var(--accent);
+  color: var(--bg);
+  padding: 15px 40px;
+  border: none;
+  border-radius: 25px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.package-modal-cta:hover {
+  background: var(--dark-gold);
+  transform: translateY(-2px);
+}
+
+/* Mobile Modal */
+@media (max-width: 768px) {
+  .package-modal-content {
+    width: 95%;
+    max-height: 95vh;
+  }
+  
+  .package-modal-header {
+    padding: 30px 20px 15px;
+  }
+  
+  .package-modal-header h2 {
+    font-size: 2rem;
+  }
+  
+  .package-modal-body {
+    padding: 20px;
+  }
+  
+  .package-modal-footer {
+    padding: 15px 20px 30px;
+  }
+  
+  .package-menu-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .package-modal-close {
+    top: 15px;
+    left: 15px;
+    font-size: 1.5rem;
+  }
 }
 
 /* Event Categories */
