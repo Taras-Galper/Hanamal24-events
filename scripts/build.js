@@ -24,6 +24,10 @@ const hasAirtableCredentials = AIRTABLE_TOKEN && AIRTABLE_BASE;
 if (!hasAirtableCredentials) {
   console.warn("⚠️  AIRTABLE_TOKEN or AIRTABLE_BASE not found - building with static content only");
   console.warn("   To enable Airtable integration, set these environment variables");
+  console.warn("   AIRTABLE_TOKEN:", AIRTABLE_TOKEN ? "SET" : "NOT SET");
+  console.warn("   AIRTABLE_BASE:", AIRTABLE_BASE ? "SET" : "NOT SET");
+} else {
+  console.log("✅ Airtable credentials found - building with live data");
 }
 
 const outDir = path.join(__dirname, "..", "dist");

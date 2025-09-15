@@ -13,7 +13,7 @@ services:
       - key: AIRTABLE_BASE
         value: appeW41fJAbVdeWoU
       - key: BASE_URL
-        value: https://hanamal24-events.onrender.com
+        value: https://hanamal24events.onrender.com
       - key: SITE_NAME
         value: Hanamal 24
       - key: SITE_CITY
