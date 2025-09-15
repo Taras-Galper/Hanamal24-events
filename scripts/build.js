@@ -382,13 +382,13 @@ async function build() {
         <div class="gallery-container">
           <h2 class="gallery-title">גלריית תמונות</h2>
           <div class="gallery-grid" id="gallery-grid">
-            ${activeGalleryItems.slice(0, initialImages).map(item => {
+            ${activeGalleryItems.slice(0, initialImages).map((item, index) => {
               const imageUrl = firstImageFrom(item);
               const title = item["כותרת (Title)"] || item.Title || item.Name || "תמונה";
               const description = item["תיאור (Description)"] || item.Description || "";
               
               return `
-                <div class="gallery-item" onclick="openGalleryModal('${imageUrl}', '${title.replace(/'/g, "\\'")}', '${description.replace(/'/g, "\\'")}')">
+                <div class="gallery-item" onclick="openGalleryModal('${imageUrl}', '${title.replace(/'/g, "\\'")}', '${description.replace(/'/g, "\\'")}', ${index})">
                   <div class="gallery-image-container">
                     <img src="${imageUrl}" alt="${title}" class="gallery-image" loading="lazy" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.add('show');">
                     <div class="image-placeholder">📷</div>
@@ -535,10 +535,32 @@ async function build() {
       <div id="gallery-modal" class="gallery-modal" style="display: none;">
         <div class="gallery-modal-content">
           <button class="gallery-modal-close" onclick="closeGalleryModal()">&times;</button>
-          <img id="gallery-modal-image" class="gallery-modal-image" src="" alt="">
+          
+          <!-- Navigation Controls -->
+          <button class="gallery-nav gallery-nav-prev" onclick="previousGalleryImage()" id="gallery-prev-btn">
+            <span>&#8249;</span>
+          </button>
+          <button class="gallery-nav gallery-nav-next" onclick="nextGalleryImage()" id="gallery-next-btn">
+            <span>&#8250;</span>
+          </button>
+          
+          <!-- Main Image -->
+          <div class="gallery-modal-image-container">
+            <img id="gallery-modal-image" class="gallery-modal-image" src="" alt="">
+            <div class="gallery-image-counter">
+              <span id="gallery-current-index">1</span> / <span id="gallery-total-count">1</span>
+            </div>
+          </div>
+          
+          <!-- Image Info -->
           <div class="gallery-modal-info">
             <h3 id="gallery-modal-title" class="gallery-modal-title"></h3>
             <p id="gallery-modal-description" class="gallery-modal-description"></p>
+          </div>
+          
+          <!-- Thumbnail Navigation -->
+          <div class="gallery-thumbnails" id="gallery-thumbnails">
+            <!-- Thumbnails will be populated by JavaScript -->
           </div>
         </div>
       </div>

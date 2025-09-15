@@ -1,5 +1,5 @@
 // public/gallery-modal.js
-// Gallery modal functionality for image expansion and load more
+// Robust gallery modal functionality with navigation and scrolling
 
 class GalleryModalHandler {
   constructor() {
@@ -9,10 +9,17 @@ class GalleryModalHandler {
     this.modalDescription = document.getElementById('gallery-modal-description');
     this.galleryGrid = document.getElementById('gallery-grid');
     this.viewMoreBtn = document.querySelector('.gallery-view-more-btn');
+    this.thumbnailsContainer = document.getElementById('gallery-thumbnails');
+    this.currentIndexElement = document.getElementById('gallery-current-index');
+    this.totalCountElement = document.getElementById('gallery-total-count');
+    this.prevBtn = document.getElementById('gallery-prev-btn');
+    this.nextBtn = document.getElementById('gallery-next-btn');
     
     this.currentImagesShown = 6;
     this.imagesPerLoad = 6;
     this.galleryData = window.GALLERY_DATA || [];
+    this.currentImageIndex = 0;
+    this.isModalOpen = false;
     
     this.init();
   }
@@ -25,24 +32,80 @@ class GalleryModalHandler {
       }
     });
 
-    // Close modal with Escape key
+    // Keyboard navigation
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && this.galleryModal.style.display === 'flex') {
-        this.closeModal();
+      if (!this.isModalOpen) return;
+      
+      switch(e.key) {
+        case 'Escape':
+          this.closeModal();
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          this.previousImage();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          this.nextImage();
+          break;
+      }
+    });
+
+    // Touch/swipe support for mobile
+    this.addTouchSupport();
+  }
+
+  addTouchSupport() {
+    let startX = 0;
+    let startY = 0;
+    let endX = 0;
+    let endY = 0;
+
+    this.galleryModal.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    });
+
+    this.galleryModal.addEventListener('touchend', (e) => {
+      endX = e.changedTouches[0].clientX;
+      endY = e.changedTouches[0].clientY;
+      
+      const diffX = startX - endX;
+      const diffY = startY - endY;
+      
+      // Only handle horizontal swipes
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+        if (diffX > 0) {
+          this.nextImage(); // Swipe left = next image
+        } else {
+          this.previousImage(); // Swipe right = previous image
+        }
       }
     });
   }
 
-  openModal(imageUrl, title, description) {
+  openModal(imageUrl, title, description, imageIndex = 0) {
+    this.currentImageIndex = imageIndex;
+    this.isModalOpen = true;
+    
     // Set modal content
     this.modalImage.src = imageUrl;
     this.modalImage.alt = title;
     this.modalTitle.textContent = title;
     this.modalDescription.textContent = description || '';
 
+    // Update counter
+    this.updateCounter();
+    
+    // Generate thumbnails
+    this.generateThumbnails();
+    
+    // Update navigation buttons
+    this.updateNavigationButtons();
+
     // Show modal
     this.galleryModal.style.display = 'flex';
-    document.body.style.overflow = 'hidden'; // Prevent scrolling background
+    document.body.style.overflow = 'hidden';
 
     // Add fade-in animation
     setTimeout(() => {
@@ -51,13 +114,101 @@ class GalleryModalHandler {
   }
 
   closeModal() {
+    this.isModalOpen = false;
+    
     // Add fade-out animation
     this.galleryModal.style.opacity = '0';
     
     setTimeout(() => {
       this.galleryModal.style.display = 'none';
-      document.body.style.overflow = ''; // Restore scrolling
+      document.body.style.overflow = '';
     }, 300);
+  }
+
+  nextImage() {
+    if (this.currentImageIndex < this.galleryData.length - 1) {
+      this.currentImageIndex++;
+      this.updateImage();
+    }
+  }
+
+  previousImage() {
+    if (this.currentImageIndex > 0) {
+      this.currentImageIndex--;
+      this.updateImage();
+    }
+  }
+
+  goToImage(index) {
+    if (index >= 0 && index < this.galleryData.length) {
+      this.currentImageIndex = index;
+      this.updateImage();
+    }
+  }
+
+  updateImage() {
+    const currentItem = this.galleryData[this.currentImageIndex];
+    const imageUrl = this.getImageUrl(currentItem);
+    const title = currentItem["כותרת (Title)"] || currentItem.Title || currentItem.Name || "תמונה";
+    const description = currentItem["תיאור (Description)"] || currentItem.Description || "";
+
+    // Update main image with fade effect
+    this.modalImage.style.opacity = '0';
+    
+    setTimeout(() => {
+      this.modalImage.src = imageUrl;
+      this.modalImage.alt = title;
+      this.modalTitle.textContent = title;
+      this.modalDescription.textContent = description || '';
+      this.modalImage.style.opacity = '1';
+    }, 150);
+
+    // Update counter
+    this.updateCounter();
+    
+    // Update thumbnails
+    this.updateThumbnails();
+    
+    // Update navigation buttons
+    this.updateNavigationButtons();
+  }
+
+  updateCounter() {
+    this.currentIndexElement.textContent = this.currentImageIndex + 1;
+    this.totalCountElement.textContent = this.galleryData.length;
+  }
+
+  updateNavigationButtons() {
+    this.prevBtn.style.display = this.currentImageIndex > 0 ? 'flex' : 'none';
+    this.nextBtn.style.display = this.currentImageIndex < this.galleryData.length - 1 ? 'flex' : 'none';
+  }
+
+  generateThumbnails() {
+    this.thumbnailsContainer.innerHTML = '';
+    
+    this.galleryData.forEach((item, index) => {
+      const thumbnail = document.createElement('img');
+      thumbnail.src = this.getImageUrl(item);
+      thumbnail.alt = item["כותרת (Title)"] || item.Title || item.Name || "תמונה";
+      thumbnail.className = 'gallery-thumbnail';
+      
+      if (index === this.currentImageIndex) {
+        thumbnail.classList.add('active');
+      }
+      
+      thumbnail.addEventListener('click', () => {
+        this.goToImage(index);
+      });
+      
+      this.thumbnailsContainer.appendChild(thumbnail);
+    });
+  }
+
+  updateThumbnails() {
+    const thumbnails = this.thumbnailsContainer.querySelectorAll('.gallery-thumbnail');
+    thumbnails.forEach((thumb, index) => {
+      thumb.classList.toggle('active', index === this.currentImageIndex);
+    });
   }
 
   loadMoreImages() {
@@ -73,13 +224,14 @@ class GalleryModalHandler {
     }
 
     // Create HTML for new images
-    const newImagesHTML = imagesToLoad.map(item => {
+    const newImagesHTML = imagesToLoad.map((item, index) => {
       const imageUrl = this.getImageUrl(item);
       const title = item["כותרת (Title)"] || item.Title || item.Name || "תמונה";
       const description = item["תיאור (Description)"] || item.Description || "";
+      const globalIndex = this.currentImagesShown + index;
       
       return `
-        <div class="gallery-item" onclick="openGalleryModal('${imageUrl}', '${title.replace(/'/g, "\\'")}', '${description.replace(/'/g, "\\'")}')">
+        <div class="gallery-item" onclick="openGalleryModal('${imageUrl}', '${title.replace(/'/g, "\\'")}', '${description.replace(/'/g, "\\'")}', ${globalIndex})">
           <div class="gallery-image-container">
             <img src="${imageUrl}" alt="${title}" class="gallery-image" loading="lazy" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.add('show');">
             <div class="image-placeholder">📷</div>
@@ -149,12 +301,20 @@ class GalleryModalHandler {
 const galleryModalHandler = new GalleryModalHandler();
 
 // Expose functions to global scope for HTML onclick
-window.openGalleryModal = (imageUrl, title, description) => {
-  galleryModalHandler.openModal(imageUrl, title, description);
+window.openGalleryModal = (imageUrl, title, description, imageIndex = 0) => {
+  galleryModalHandler.openModal(imageUrl, title, description, imageIndex);
 };
 
 window.closeGalleryModal = () => {
   galleryModalHandler.closeModal();
+};
+
+window.nextGalleryImage = () => {
+  galleryModalHandler.nextImage();
+};
+
+window.previousGalleryImage = () => {
+  galleryModalHandler.previousImage();
 };
 
 window.loadMoreGalleryImages = () => {
