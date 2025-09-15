@@ -505,12 +505,12 @@ async function build() {
     ];
     
     const categoriesSection = `
-      <section class="event-categories" style="margin-top: 0; padding-top: 120px;">
+      <section class="event-categories event-categories-top">
         <h2>סוגי האירועים שלנו</h2>
         <div class="categories-grid">
           ${eventCategories.map(category => `
             <div class="category-card">
-              <div style="font-size: 3rem; margin-bottom: 20px;">${category.icon}</div>
+              <div class="category-icon">${category.icon}</div>
               <h3>${category.name}</h3>
               <p>${category.description}</p>
             </div>
