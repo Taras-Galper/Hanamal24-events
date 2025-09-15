@@ -380,7 +380,6 @@ async function build() {
                     <select id="event-type" name="eventType" required>
                       <option value="">בחר סוג אירוע</option>
                       <option value="יום הולדת">יום הולדת</option>
-                      <option value="אירוע עסקי">אירוע עסקי</option>
                       <option value="חתונה">חתונה</option>
                       <option value="אירוע פרטי">אירוע פרטי</option>
                       <option value="אחר">אחר</option>
