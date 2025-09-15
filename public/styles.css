@@ -859,6 +859,13 @@ main {
   transform: translateX(5px);
 }
 
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
 /* Contact Section */
 .contact {
   background: var(--bg);
