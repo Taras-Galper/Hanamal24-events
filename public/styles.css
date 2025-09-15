@@ -447,6 +447,23 @@ main {
   font-size: 48px;
 }
 
+/* Image placeholder styles */
+.image-placeholder {
+  display: none;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, #23232a 25%, #2a2a32 25%, #2a2a32 50%, #23232a 50%, #23232a 75%, #2a2a32 75%);
+  background-size: 20px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+}
+
+.image-placeholder.show {
+  display: flex;
+}
+
 /* Packages Section */
 .packages-section {
   padding: 100px 40px;
@@ -556,6 +573,7 @@ main {
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.8);
+  -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
 }
 
@@ -1570,6 +1588,7 @@ footer p {
     display: flex;
     align-items: center;
     justify-content: center;
+    min-height: 0;
   }
   
   .contact-content {

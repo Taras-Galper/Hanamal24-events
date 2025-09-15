@@ -44,6 +44,9 @@
             border-radius: 5px;
             background: #2a2a2a;
         }
+        .hidden {
+            display: none;
+        }
         .success { border: 2px solid #10b981; }
         .error { border: 2px solid #ef4444; }
     </style>
@@ -69,7 +72,7 @@
     
     <button onclick="testWebhook()">Test Webhook</button>
     
-    <div id="result" class="result" style="display: none;"></div>
+    <div id="result" class="result hidden"></div>
 
     <script>
         async function testWebhook() {
@@ -129,7 +132,7 @@
         
         function showResult(message, type) {
             const resultDiv = document.getElementById('result');
-            resultDiv.style.display = 'block';
+            resultDiv.classList.remove('hidden');
             resultDiv.textContent = message;
             resultDiv.className = `result ${type}`;
         }
