@@ -664,26 +664,68 @@ main {
 
 .package-menu-item {
   background: rgba(255, 255, 255, 0.05);
-  padding: 20px;
+  padding: 0;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
-.package-menu-item h4 {
+.package-menu-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(212, 175, 55, 0.3);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.dish-image-container {
+  width: 100%;
+  height: 150px;
+  overflow: hidden;
+  position: relative;
+}
+
+.dish-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.package-menu-item:hover .dish-image {
+  transform: scale(1.05);
+}
+
+.dish-content {
+  padding: 20px;
+}
+
+.dish-content h4 {
   color: var(--accent);
   margin-bottom: 8px;
   font-size: 1.1rem;
+  font-weight: 600;
 }
 
-.package-menu-item p {
+.dish-description {
   color: var(--muted);
   font-size: 0.95rem;
-  margin: 0;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
 }
 
-.package-menu-item .price {
+.dish-category {
+  color: var(--gold);
+  font-size: 0.85rem;
+  margin: 0 0 8px 0;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dish-price {
   color: var(--gold);
   font-weight: 600;
+  font-size: 1rem;
   margin-top: 8px;
 }
 
@@ -742,6 +784,22 @@ main {
     top: 15px;
     left: 15px;
     font-size: 1.5rem;
+  }
+  
+  .dish-image-container {
+    height: 120px;
+  }
+  
+  .dish-content {
+    padding: 15px;
+  }
+  
+  .dish-content h4 {
+    font-size: 1rem;
+  }
+  
+  .dish-description {
+    font-size: 0.9rem;
   }
 }
 

@@ -157,15 +157,46 @@ class PackageModalHandler {
     const description = dish["תיאור (Description)"] || dish.Description || "";
     const price = dish["מחיר (Price)"] || dish.Price;
     const category = dish["קטגוריה (Category)"] || dish.Category || "";
+    
+    // Get dish image - check multiple possible field names
+    const imageUrl = this.getDishImage(dish);
 
     return `
       <div class="package-menu-item">
-        <h4>${name}</h4>
-        ${description ? `<p>${description}</p>` : ""}
-        ${category ? `<p class="category">${category}</p>` : ""}
-        ${price ? `<div class="price">${this.formatPrice(price)}</div>` : ""}
+        ${imageUrl ? `<div class="dish-image-container">
+          <img src="${imageUrl}" alt="${name}" class="dish-image" onerror="this.style.display='none'">
+        </div>` : ""}
+        <div class="dish-content">
+          <h4>${name}</h4>
+          ${description ? `<p class="dish-description">${description}</p>` : ""}
+          ${category ? `<p class="dish-category">${category}</p>` : ""}
+          ${price ? `<div class="dish-price">${this.formatPrice(price)}</div>` : ""}
+        </div>
       </div>
     `;
+  }
+
+  getDishImage(dish) {
+    // Check multiple possible field names for dish images
+    const imageFields = [
+      "תמונה (Image)",
+      "Image", 
+      "תמונה",
+      "Picture",
+      "Photo",
+      "תמונה של המנה"
+    ];
+    
+    for (const field of imageFields) {
+      if (dish[field]) {
+        if (Array.isArray(dish[field])) {
+          return dish[field][0]?.url || dish[field][0];
+        }
+        return dish[field];
+      }
+    }
+    
+    return null;
   }
 
   formatPrice(price) {
