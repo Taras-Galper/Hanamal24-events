@@ -115,7 +115,6 @@ main {
 .hero-carousel {
   position: relative;
   min-height: 100vh;
-  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1507,10 +1506,24 @@ footer p {
   /* Better carousel on mobile */
   .hero-carousel {
     touch-action: pan-y;
+    overflow: visible;
+    min-height: 80vh;
   }
   
   .hero-slides {
     touch-action: pan-x;
+    height: 80vh;
+  }
+  
+  /* Ensure page can scroll on mobile */
+  body {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  
+  html {
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 }
 
