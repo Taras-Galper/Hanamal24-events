@@ -65,11 +65,24 @@ header {
   letter-spacing: 2px;
   transition: all 0.3s ease;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
 .brand:hover {
   color: var(--dark-gold);
   transform: scale(1.05);
+}
+
+.brand-logo {
+  height: 40px;
+  width: auto;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  transition: all 0.3s ease;
+}
+
+.brand:hover .brand-logo {
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4)) brightness(1.1);
 }
 
 .nav {
@@ -1145,6 +1158,10 @@ footer p {
   
   .brand {
     font-size: 1.5rem;
+  }
+  
+  .brand-logo {
+    height: 32px;
   }
   
   .book-btn {

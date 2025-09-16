@@ -44,7 +44,9 @@ ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script
       </nav>
     </div>
     <div class="header-right">
-      <a class="brand" href="/">${escapeHtml(site.name)}</a>
+      <a class="brand" href="/">
+        <img src="/logo.svg" alt="${escapeHtml(site.name)}" class="brand-logo">
+      </a>
     </div>
   </div>
 </header>
