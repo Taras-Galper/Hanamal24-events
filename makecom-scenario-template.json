@@ -1,0 +1,63 @@
+{
+  "scenario": {
+    "name": "Airtable Button → Rebuild Sites",
+    "description": "Triggers GitHub Actions and Render.com rebuilds when Airtable button is clicked",
+    "modules": [
+      {
+        "id": 1,
+        "type": "airtable",
+        "name": "Watch Airtable Records",
+        "config": {
+          "base": "Hanamal 24 Events",
+          "table": "Events",
+          "filter": {
+            "field": "Rebuild Site",
+            "condition": "is not empty"
+          }
+        }
+      },
+      {
+        "id": 2,
+        "type": "github",
+        "name": "Trigger GitHub Actions",
+        "config": {
+          "method": "POST",
+          "url": "https://api.github.com/repos/Taras-Galper/Hanamal24-events/actions/workflows/build.yml/dispatches",
+          "headers": {
+            "Accept": "application/vnd.github.v3+json",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "ref": "main",
+            "inputs": {
+              "reason": "Airtable button triggered via Make.com"
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "type": "http",
+        "name": "Trigger Render.com Deploy",
+        "config": {
+          "method": "POST",
+          "url": "https://api.render.com/deploy/srv-d1rnnkp5pdvs73ebjcc0?key=h0hONC2Ttt8",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {}
+        }
+      },
+      {
+        "id": 4,
+        "type": "email",
+        "name": "Send Notification",
+        "config": {
+          "to": "your-email@example.com",
+          "subject": "🚀 Site Rebuild Triggered",
+          "body": "GitHub Actions: {{2.status}}\nRender.com: {{3.status}}\n\nYour sites will be updated in 2-3 minutes."
+        }
+      }
+    ]
+  }
+}

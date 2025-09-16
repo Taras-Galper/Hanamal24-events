@@ -287,13 +287,26 @@ class GalleryModalHandler {
       if (item[field]) {
         if (Array.isArray(item[field])) {
           const imageUrl = item[field][0]?.url || item[field][0];
-          return imageUrl;
+          if (imageUrl) {
+            // Try local backup first, then fallback to original
+            return this.getLocalImagePath(imageUrl) || imageUrl;
+          }
+        } else if (typeof item[field] === 'string') {
+          return this.getLocalImagePath(item[field]) || item[field];
         }
-        return item[field];
       }
     }
     
     return "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&h=600&fit=crop"; // Fallback
+  }
+
+  getLocalImagePath(originalUrl) {
+    // Check if we have a local backup of this image
+    // This would be populated by the build process
+    if (window.imageMap && window.imageMap[originalUrl]) {
+      return window.imageMap[originalUrl];
+    }
+    return null;
   }
 }
 

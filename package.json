@@ -7,8 +7,9 @@
   "scripts": {
     "build": "node scripts/build.js",
     "start": "node scripts/serve.js",
-    "dev": "node scripts/build.js && python -m http.server 8000",
-    "clean": "rm -rf dist"
+    "dev": "node scripts/build.js && npx serve dist -p 3000",
+    "clean": "rm -rf dist",
+    "check-images": "node scripts/check-images.js"
   },
   "dependencies": {
     "dotenv": "^17.2.2"

@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import { layout, card } from "../src/templates.js";
 import { slugify, iso, money, first } from "../src/normalize.js";
+import { backupImages, getImageUrl } from "./image-backup.js";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -78,10 +79,13 @@ function siteMeta() {
   return { baseUrl: BASE_URL, name: SITE_NAME, city: SITE_CITY, country: SITE_COUNTRY, cuisine: CUISINE };
 }
 
-function firstImageFrom(record) {
+function firstImageFrom(record, imageMap = null) {
   const imgs = record.Image || record.Images || record.Photos || record["Event Photos"] || record["תמונה (Image)"];
   const url = Array.isArray(imgs) ? first(imgs.map(x => x.url || x).filter(Boolean)) : null;
-  return url || null;
+  if (url) {
+    return getImageUrl({ [Object.keys(record).find(k => record[k] === imgs)]: imgs }, imageMap);
+  }
+  return null;
 }
 
 function firstVideoFrom(record) {
@@ -136,6 +140,19 @@ async function build() {
   ]);
 
   console.log(`Found ${events.length} events, ${menus.length} menus, ${packages.length} packages, ${dishes.length} dishes, ${about.length} about records, ${hero.length} hero records, ${gallery.length} gallery items`);
+  
+  // Backup images for reliability
+  let imageMap = new Map();
+  if (hasAirtableCredentials) {
+    console.log("📸 Starting image backup process...");
+    const backupResult = await backupImages({ events, packages, dishes, about, hero, gallery });
+    imageMap = backupResult.imageMap;
+    console.log(`✅ Image backup completed. ${backupResult.failed} images failed to backup.`);
+    
+    // Save image map for monitoring
+    const imageMapObj = Object.fromEntries(imageMap);
+    writeFile(path.join(outDir, 'image-map.json'), JSON.stringify(imageMapObj, null, 2));
+  }
   
   // Add fallback content if no Airtable data
   const fallbackHero = [{
@@ -421,11 +438,15 @@ async function build() {
           <div class="packages-grid">
             ${finalPackages.map((pkg, index) => `
               <div class="package-card" data-package-id="${pkg.id || `package-${index}`}" onclick="openPackageModal('${pkg.id || `package-${index}`}')">
-                <h3 class="package-title">${pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name || "חבילה"}</h3>
-                ${pkg["מחיר (Price)"] || pkg.Price ? `<div class="package-price">${money(pkg["מחיר (Price)"] || pkg.Price)}</div>` : ""}
-                ${pkg["תיאור (Description)"] || pkg.Description ? `<p class="package-description">${pkg["תיאור (Description)"] || pkg.Description}</p>` : ""}
-                ${pkg["תמונה (Image)"] ? `<img src="${Array.isArray(pkg["תמונה (Image)"]) ? pkg["תמונה (Image)"][0].url : pkg["תמונה (Image)"]}" alt="${pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name}" class="package-image">` : ""}
-                <button class="package-link" onclick="event.stopPropagation(); openPackageModal('${pkg.id || `package-${index}`}')">לפרטים נוספים</button>
+                <div class="package-image-container">
+                  ${pkg["תמונה (Image)"] ? `<img src="${Array.isArray(pkg["תמונה (Image)"]) ? pkg["תמונה (Image)"][0].url : pkg["תמונה (Image)"]}" alt="${pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name}" class="package-image" loading="lazy" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.add('show');"><div class="image-placeholder">📦</div>` : `<div class="image-placeholder show">📦</div>`}
+                </div>
+                <div class="package-content">
+                  <h3 class="package-title">${pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name || "חבילה"}</h3>
+                  ${pkg["מחיר (Price)"] || pkg.Price ? `<div class="package-price">${money(pkg["מחיר (Price)"] || pkg.Price)}</div>` : ""}
+                  ${pkg["תיאור (Description)"] || pkg.Description ? `<p class="package-description">${pkg["תיאור (Description)"] || pkg.Description}</p>` : ""}
+                  <button class="package-link" onclick="event.stopPropagation(); openPackageModal('${pkg.id || `package-${index}`}')">לפרטים נוספים</button>
+                </div>
               </div>
             `).join("")}
           </div>
