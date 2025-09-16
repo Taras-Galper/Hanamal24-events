@@ -1137,12 +1137,30 @@ footer p {
   .header-content {
     padding: 0 15px;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
   }
   
   .header-left, .header-center, .header-right {
     width: 100%;
     justify-content: center;
+  }
+  
+  /* Reorder header elements for mobile */
+  .header-content {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .header-center {
+    order: 1;
+  }
+  
+  .header-right {
+    order: 2;
+  }
+  
+  .header-left {
+    order: 3;
   }
   
   .nav {
@@ -1165,8 +1183,9 @@ footer p {
   }
   
   .book-btn {
-    padding: 10px 20px;
-    font-size: 0.9rem;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    border-radius: 20px;
   }
   
   /* Hero Carousel */
@@ -1400,8 +1419,9 @@ footer p {
   
   /* Button adjustments */
   .btn {
-    padding: 10px 20px;
-    font-size: 0.9rem;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    border-radius: 20px;
   }
 }
 
@@ -1463,8 +1483,8 @@ footer p {
   .btn,
   .submit-btn,
   .package-link {
-    min-height: 44px;
-    min-width: 44px;
+    min-height: 36px;
+    min-width: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1524,12 +1544,12 @@ footer p {
   .hero-carousel {
     touch-action: pan-y;
     overflow: visible;
-    min-height: 80vh;
+    min-height: 50vh;
   }
   
   .hero-slides {
     touch-action: pan-x;
-    height: 80vh;
+    height: 50vh;
   }
   
   /* Ensure page can scroll on mobile */
