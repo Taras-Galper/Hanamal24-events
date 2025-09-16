@@ -5,7 +5,7 @@ import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import { layout, card } from "../src/templates.js";
 import { slugify, iso, money, first } from "../src/normalize.js";
-import { backupImages, getImageUrl } from "./image-backup.js";
+import { backupImages, getImageUrl, cleanupOldImages } from "./image-backup.js";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -145,9 +145,17 @@ async function build() {
   let imageMap = new Map();
   if (hasAirtableCredentials) {
     console.log("📸 Starting image backup process...");
+    
+    // Clean up old duplicate images first
+    console.log("🧹 Cleaning up old duplicate images...");
+    const cleanupResult = cleanupOldImages();
+    if (cleanupResult.removed > 0) {
+      console.log(`🗑️ Removed ${cleanupResult.removed} old duplicate images`);
+    }
+    
     const backupResult = await backupImages({ events, packages, dishes, about, hero, gallery });
     imageMap = backupResult.imageMap;
-    console.log(`✅ Image backup completed. ${backupResult.failed} images failed to backup.`);
+    console.log(`✅ Image backup completed. ${backupResult.downloaded} new, ${backupResult.skipped} reused, ${backupResult.failed} failed.`);
     
     // Save image map for monitoring
     const imageMapObj = Object.fromEntries(imageMap);

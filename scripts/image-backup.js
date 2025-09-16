@@ -6,6 +6,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import https from 'https';
 import { promisify } from 'util';
+import crypto from 'crypto';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const imagesDir = path.join(__dirname, '..', 'dist', 'images');
@@ -49,17 +50,69 @@ async function downloadImage(url, filename) {
   });
 }
 
-// Generate safe filename from URL
-function generateFilename(url, index = 0) {
+// Generate content-based hash filename to prevent duplicates
+function generateFilename(url) {
   try {
+    // Create a hash of the URL to ensure consistent naming
+    const hash = crypto.createHash('md5').update(url).digest('hex').substring(0, 12);
+    
+    // Extract file extension from URL
     const urlObj = new URL(url);
     const pathname = urlObj.pathname;
     const ext = path.extname(pathname) || '.jpg';
-    const baseName = path.basename(pathname, ext) || 'image';
-    const safeName = baseName.replace(/[^a-zA-Z0-9]/g, '_');
-    return `${safeName}_${index}${ext}`;
+    
+    return `${hash}${ext}`;
   } catch (error) {
-    return `image_${Date.now()}_${index}.jpg`;
+    // Fallback to timestamp if URL parsing fails
+    return `img_${Date.now()}.jpg`;
+  }
+}
+
+// Check if image already exists
+function imageExists(filename) {
+  const distPath = path.join(imagesDir, filename);
+  const publicPath = path.join(publicImagesDir, filename);
+  return fs.existsSync(distPath) || fs.existsSync(publicPath);
+}
+
+// Clean up old duplicate images (optional cleanup function)
+export function cleanupOldImages() {
+  try {
+    const files = fs.readdirSync(imagesDir);
+    const publicFiles = fs.readdirSync(publicImagesDir);
+    
+    // Find files that match old naming pattern (with underscores and numbers)
+    const oldPattern = /^[a-zA-Z0-9_]+_\d+\.(jpg|jpeg|png|gif|webp)$/;
+    const oldFiles = files.filter(file => oldPattern.test(file));
+    const oldPublicFiles = publicFiles.filter(file => oldPattern.test(file));
+    
+    console.log(`🧹 Found ${oldFiles.length} old image files to clean up`);
+    
+    // Remove old files
+    oldFiles.forEach(file => {
+      const filePath = path.join(imagesDir, file);
+      try {
+        fs.unlinkSync(filePath);
+        console.log(`🗑️ Removed old image: ${file}`);
+      } catch (error) {
+        console.warn(`⚠️ Could not remove ${file}: ${error.message}`);
+      }
+    });
+    
+    oldPublicFiles.forEach(file => {
+      const filePath = path.join(publicImagesDir, file);
+      try {
+        fs.unlinkSync(filePath);
+        console.log(`🗑️ Removed old public image: ${file}`);
+      } catch (error) {
+        console.warn(`⚠️ Could not remove ${file}: ${error.message}`);
+      }
+    });
+    
+    return { removed: oldFiles.length + oldPublicFiles.length };
+  } catch (error) {
+    console.warn(`⚠️ Cleanup failed: ${error.message}`);
+    return { removed: 0, error: error.message };
   }
 }
 
@@ -89,7 +142,7 @@ export async function backupImages(data) {
         for (const img of images) {
           const imageUrl = img.url || img;
           if (imageUrl && typeof imageUrl === 'string' && imageUrl.startsWith('http')) {
-            const filename = generateFilename(imageUrl, imageIndex++);
+            const filename = generateFilename(imageUrl);
             const localPath = `/images/${filename}`;
             
             // Store mapping for later download
@@ -97,7 +150,8 @@ export async function backupImages(data) {
               filename,
               localPath,
               recordType,
-              recordId: record.id
+              recordId: record.id,
+              exists: imageExists(filename)
             });
           }
         }
@@ -113,10 +167,16 @@ export async function backupImages(data) {
   if (data.hero) data.hero.forEach(record => processRecord(record, 'hero'));
   if (data.about) data.about.forEach(record => processRecord(record, 'about'));
   
-  console.log(`📸 Found ${imageMap.size} images to backup`);
+  // Filter out existing images
+  const imagesToDownload = Array.from(imageMap.entries()).filter(([url, info]) => !info.exists);
+  const existingImages = Array.from(imageMap.entries()).filter(([url, info]) => info.exists);
   
-  // Download images
-  const downloadPromises = Array.from(imageMap.entries()).map(async ([originalUrl, info]) => {
+  console.log(`📸 Found ${imageMap.size} total images`);
+  console.log(`✅ ${existingImages.length} images already exist (skipping)`);
+  console.log(`⬇️ ${imagesToDownload.length} new images to download`);
+  
+  // Download only new images
+  const downloadPromises = imagesToDownload.map(async ([originalUrl, info]) => {
     try {
       const filePath = path.join(imagesDir, info.filename);
       await downloadImage(originalUrl, filePath);
@@ -137,14 +197,30 @@ export async function backupImages(data) {
   const successful = results.filter(r => r.success);
   const failed = results.filter(r => !r.success);
   
-  console.log(`✅ Successfully backed up ${successful.length} images`);
+  // Create final image map including existing images
+  const finalImageMap = new Map();
+  
+  // Add existing images
+  existingImages.forEach(([url, info]) => {
+    finalImageMap.set(url, info.localPath);
+  });
+  
+  // Add newly downloaded images
+  successful.forEach(r => {
+    finalImageMap.set(r.originalUrl, r.localPath);
+  });
+  
+  console.log(`✅ Successfully backed up ${successful.length} new images`);
+  console.log(`♻️ Reused ${existingImages.length} existing images`);
   if (failed.length > 0) {
     console.log(`⚠️ Failed to backup ${failed.length} images`);
   }
   
   return {
-    imageMap: new Map(successful.map(r => [r.originalUrl, r.localPath])),
-    failed: failed.length
+    imageMap: finalImageMap,
+    failed: failed.length,
+    skipped: existingImages.length,
+    downloaded: successful.length
   };
 }
 
