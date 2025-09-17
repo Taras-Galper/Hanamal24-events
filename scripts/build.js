@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import { layout, card } from "../src/templates.js";
 import { slugify, iso, money, first } from "../src/normalize.js";
 import { backupImages, getImageUrl, cleanupOldImages } from "./image-backup.js";
+import { syncImagesToCloudinary, getOptimizedImageUrl } from "./cloudinary-sync.js";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -79,13 +80,33 @@ function siteMeta() {
   return { baseUrl: BASE_URL, name: SITE_NAME, city: SITE_CITY, country: SITE_COUNTRY, cuisine: CUISINE };
 }
 
-function firstImageFrom(record, imageMap = null) {
-  const imgs = record.Image || record.Images || record.Photos || record["Event Photos"] || record["תמונה (Image)"];
-  const url = Array.isArray(imgs) ? first(imgs.map(x => x.url || x).filter(Boolean)) : null;
-  if (url) {
-    return getImageUrl({ [Object.keys(record).find(k => record[k] === imgs)]: imgs }, imageMap);
+function firstImageFrom(record, cloudinaryImageMap = null, localImageMap = null) {
+  const imageFields = [
+    "תמונה (Image)", "Image", "תמונה", "Picture", "Photo", 
+    "תמונה של המנה", "Event Photos"
+  ];
+  
+  for (const field of imageFields) {
+    if (record[field]) {
+      const images = Array.isArray(record[field]) ? record[field] : [record[field]];
+      for (const img of images) {
+        const originalUrl = img.url || img;
+        if (originalUrl && typeof originalUrl === 'string' && originalUrl.startsWith('http')) {
+          // Use Cloudinary optimized URL if available
+          if (cloudinaryImageMap && cloudinaryImageMap.has(originalUrl)) {
+            return cloudinaryImageMap.get(originalUrl);
+          }
+          // Fallback to local backup
+          if (localImageMap && localImageMap.has(originalUrl)) {
+            return localImageMap.get(originalUrl);
+          }
+          // Fallback to original URL
+          return originalUrl;
+        }
+      }
+    }
   }
-  return null;
+  return "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&h=600&fit=crop";
 }
 
 function firstVideoFrom(record) {
@@ -141,25 +162,39 @@ async function build() {
 
   console.log(`Found ${events.length} events, ${menus.length} menus, ${packages.length} packages, ${dishes.length} dishes, ${about.length} about records, ${hero.length} hero records, ${gallery.length} gallery items`);
   
-  // Backup images for reliability
+  // Sync images to Cloudinary for SEO and performance
+  let cloudinaryImageMap = new Map();
   let imageMap = new Map();
+  
   if (hasAirtableCredentials) {
-    console.log("📸 Starting image backup process...");
+    console.log('☁️ Starting Cloudinary sync...');
+    const cloudinaryResult = await syncImagesToCloudinary({ events, packages, dishes, gallery, hero, about });
+    cloudinaryImageMap = cloudinaryResult.imageMap;
     
-    // Clean up old duplicate images first
-    console.log("🧹 Cleaning up old duplicate images...");
-    const cleanupResult = cleanupOldImages();
-    if (cleanupResult.removed > 0) {
-      console.log(`🗑️ Removed ${cleanupResult.removed} old duplicate images`);
+    // Only run local backup if Cloudinary is not configured
+    if (cloudinaryResult.skipped === 'no-config') {
+      console.log("📸 Cloudinary not configured - using local backup system...");
+      
+      // Clean up old duplicate images first
+      console.log("🧹 Cleaning up old duplicate images...");
+      const cleanupResult = cleanupOldImages();
+      if (cleanupResult.removed > 0) {
+        console.log(`🗑️ Removed ${cleanupResult.removed} old duplicate images`);
+      }
+      
+      const backupResult = await backupImages({ events, packages, dishes, about, hero, gallery });
+      imageMap = backupResult.imageMap;
+      console.log(`✅ Image backup completed. ${backupResult.downloaded} new, ${backupResult.skipped} reused, ${backupResult.failed} failed.`);
+      
+      // Save image map for monitoring
+      const imageMapObj = Object.fromEntries(imageMap);
+      writeFile(path.join(outDir, 'image-map.json'), JSON.stringify(imageMapObj, null, 2));
+    } else {
+      console.log("☁️ Using Cloudinary images - skipping local backup");
+      // Save Cloudinary image map for monitoring
+      const imageMapObj = Object.fromEntries(cloudinaryImageMap);
+      writeFile(path.join(outDir, 'image-map.json'), JSON.stringify(imageMapObj, null, 2));
     }
-    
-    const backupResult = await backupImages({ events, packages, dishes, about, hero, gallery });
-    imageMap = backupResult.imageMap;
-    console.log(`✅ Image backup completed. ${backupResult.downloaded} new, ${backupResult.skipped} reused, ${backupResult.failed} failed.`);
-    
-    // Save image map for monitoring
-    const imageMapObj = Object.fromEntries(imageMap);
-    writeFile(path.join(outDir, 'image-map.json'), JSON.stringify(imageMapObj, null, 2));
   }
   
   // Add fallback content if no Airtable data
@@ -285,7 +320,7 @@ async function build() {
     // Get all hero data from Airtable for carousel
     const activeHeroes = finalHero.filter(h => h["פעיל (Active)"] !== false);
     const heroSlides = activeHeroes.map((heroData, index) => {
-      const heroImage = firstImageFrom(heroData);
+      const heroImage = firstImageFrom(heroData, cloudinaryImageMap, imageMap);
       const heroVideo = firstVideoFrom(heroData);
       const heroTitle = heroData["כותרת ראשית (Main Heading)"] || SITE_NAME;
       const heroSubtitle = heroData["כותרת משנה (Subheading)"] || "חוויה קולינרית ייחודית לאירועים בלתי נשכחים";
@@ -408,7 +443,7 @@ async function build() {
           <h2 class="gallery-title">גלריית תמונות</h2>
           <div class="gallery-grid" id="gallery-grid">
             ${activeGalleryItems.slice(0, initialImages).map((item, index) => {
-              const imageUrl = firstImageFrom(item);
+              const imageUrl = firstImageFrom(item, cloudinaryImageMap, imageMap);
               const title = item["כותרת (Title)"] || item.Title || item.Name || "תמונה";
               const description = item["תיאור (Description)"] || item.Description || "";
               
@@ -661,7 +696,7 @@ async function build() {
 
   // per-event
   for (const e of normalizedEvents) {
-    const heroImg = firstImageFrom(e) ? `<img src="${firstImageFrom(e)}" alt="${e["Event Name"] || e.Title || e.Name}" class="hero-img">` : "";
+    const heroImg = firstImageFrom(e, cloudinaryImageMap, imageMap) ? `<img src="${firstImageFrom(e, cloudinaryImageMap, imageMap)}" alt="${e["Event Name"] || e.Title || e.Name}" class="hero-img">` : "";
     const menuLinks = e.linkedMenus.map(m => `<li class="event-link-item"><a href="/menus/${m.slug}/">${m.Title || m.Name}</a></li>`).join("");
     const pkgList = e.linkedPkgs.map(p => `<li class="event-link-item">${p.Title || p.Name}${p.Price ? ` · ${money(p.Price)}` : ""}</li>`).join("");
     const body = `
@@ -683,7 +718,7 @@ async function build() {
       description: e.SEO_Description || e.Description || (typeof e["Event Summary (AI)"] === 'string' ? e["Event Summary (AI)"] : '') || `${SITE_NAME} אירוע`,
       body,
       url: `${BASE_URL}/events/${e.slug}/`,
-      image: firstImageFrom(e),
+      image: firstImageFrom(e, cloudinaryImageMap, imageMap),
       jsonld: {
         "@context": "https://schema.org",
         "@type": "Event",
@@ -696,7 +731,7 @@ async function build() {
           name: SITE_NAME,
           address: { "@type": "PostalAddress", addressLocality: SITE_CITY, addressCountry: SITE_COUNTRY }
         },
-        image: firstImageFrom(e) ? [firstImageFrom(e)] : undefined
+        image: firstImageFrom(e, cloudinaryImageMap, imageMap) ? [firstImageFrom(e, cloudinaryImageMap, imageMap)] : undefined
       },
       site
     });
@@ -705,7 +740,7 @@ async function build() {
 
   // menus list
   {
-    const list = Object.values(menuMap).map(m => card(`/menus/${m.slug}/`, m.Title || m.Name, "", firstImageFrom(m))).join("");
+    const list = Object.values(menuMap).map(m => card(`/menus/${m.slug}/`, m.Title || m.Name, "", firstImageFrom(m, cloudinaryImageMap, imageMap))).join("");
     const html = layout({
       title: "תפריטים",
       description: "תפריטים עונתיים וחבילות",
@@ -725,7 +760,7 @@ async function build() {
       description: m.SEO_Description || m.Description || "תפריט",
       body,
       url: `${BASE_URL}/menus/${m.slug}/`,
-      image: firstImageFrom(m),
+      image: firstImageFrom(m, cloudinaryImageMap, imageMap),
       site
     });
     writeHtml(`/menus/${m.slug}/index.html`, html);
@@ -733,7 +768,7 @@ async function build() {
 
   // packages list
   {
-    const list = Object.values(pkgMap).map(p => card(`/packages/${p.slug}/`, p["שם חבילה (Package Name)"] || p.Title || p.Name, p["מחיר (Price)"] ? money(p["מחיר (Price)"]) : "", firstImageFrom(p))).join("");
+    const list = Object.values(pkgMap).map(p => card(`/packages/${p.slug}/`, p["שם חבילה (Package Name)"] || p.Title || p.Name, p["מחיר (Price)"] ? money(p["מחיר (Price)"]) : "", firstImageFrom(p, cloudinaryImageMap, imageMap))).join("");
     const html = layout({
       title: "חבילות",
       description: "חבילות לאירועים",

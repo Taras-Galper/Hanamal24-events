@@ -12,7 +12,8 @@
     "check-images": "node scripts/check-images.js"
   },
   "dependencies": {
-    "dotenv": "^17.2.2"
+    "dotenv": "^17.2.2",
+    "cloudinary": "^2.0.1"
   },
   "engines": {
     "node": ">=18.0.0"
