@@ -1442,53 +1442,63 @@ footer p {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  /* Header */
+  /* Header - Single line layout */
   .header {
     padding: 15px 0;
   }
   
   .header-content {
     padding: 0 15px;
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .header-left, .header-center, .header-right {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  /* Reorder header elements for mobile */
-  .header-content {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .header-center {
-    order: 1;
-  }
-  
-  .header-right {
-    order: 2;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
   }
   
   .header-left {
+    flex: 0 0 auto;
+    justify-content: flex-start;
+  }
+  
+  .header-center {
+    flex: 1;
+    justify-content: center;
+    order: 2;
+  }
+  
+  .header-right {
+    flex: 0 0 auto;
+    justify-content: flex-end;
     order: 3;
   }
   
+  /* Logo - Make it bigger on mobile */
+  .brand {
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+  
+  /* Navigation - Single line, smaller */
   .nav {
     gap: 8px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: center;
+    overflow-x: auto;
+    scroll-behavior: smooth;
   }
   
   .nav a {
     font-size: 0.8rem;
     padding: 6px 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   
-  .brand {
-    font-size: 1.5rem;
+  /* Order Now button - Smaller and proportional */
+  .btn {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    border-radius: 15px;
+    min-height: 28px;
   }
   
   .brand-logo {
@@ -1745,6 +1755,12 @@ footer p {
 @media (max-width: 480px) {
   .header-content {
     padding: 0 10px;
+    gap: 8px;
+  }
+  
+  /* Logo - Even bigger on very small screens */
+  .brand {
+    font-size: 1.6rem;
   }
   
   .nav {
@@ -1754,6 +1770,13 @@ footer p {
   .nav a {
     font-size: 0.75rem;
     padding: 4px 6px;
+  }
+  
+  /* Order Now button - Even smaller on very small screens */
+  .btn {
+    padding: 5px 10px;
+    font-size: 0.7rem;
+    min-height: 26px;
   }
   
   .hero-text h1 {
@@ -1848,8 +1871,17 @@ footer p {
     text-align: center;
   }
   
-  /* Ensure images don't overflow */
-  .hero-bg-image,
+  /* Mobile hero image fixes */
+  .hero-bg-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    max-width: 100%;
+    /* Don't override height for hero images - keep object-fit: cover */
+  }
+  
+  /* Other images can use height: auto */
   .about-image img,
   .package-image {
     max-width: 100%;
@@ -1858,25 +1890,54 @@ footer p {
   
   /* Better carousel on mobile */
   .hero-carousel {
-    touch-action: pan-y;
+    touch-action: manipulation; /* Allow scrolling but prevent zoom */
     overflow: visible;
     min-height: 50vh;
+    position: relative;
+    /* Ensure proper mobile viewport handling */
+    height: auto;
+    max-height: 50vh;
   }
   
   .hero-slides {
-    touch-action: pan-x;
+    touch-action: manipulation; /* Allow horizontal swiping but prevent zoom */
     height: 50vh;
+    position: relative;
+    /* Prevent overflow issues */
+    overflow: hidden;
+  }
+  
+  /* Ensure hero slide content is properly positioned */
+  .hero-slide {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Fix scrolling interference */
+  .hero-background {
+    touch-action: none; /* Prevent touch events on background */
+  }
+  
+  .hero-content {
+    touch-action: manipulation; /* Allow touch on content */
+    position: relative;
+    z-index: 10;
   }
   
   /* Ensure page can scroll on mobile */
   body {
     overflow-x: hidden;
     overflow-y: auto;
+    scroll-behavior: smooth; /* Smooth scrolling on iOS */
   }
   
   html {
     overflow-x: hidden;
     overflow-y: auto;
+    scroll-behavior: smooth;
   }
 }
 
@@ -2347,3 +2408,299 @@ footer p {
   }
 }
 .mt-4 { margin-top: 2rem; }
+
+/* Complete Gallery Modal Styles */
+.gallery-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.gallery-modal.hidden,
+.gallery-modal {
+  display: none;
+}
+
+.gallery-modal.show {
+  display: flex;
+}
+
+.package-modal.hidden,
+.package-modal {
+  display: none;
+}
+
+.package-modal.show {
+  display: block;
+}
+
+.gallery-modal-content {
+  position: relative;
+  width: 90%;
+  max-width: 1200px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--card);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.gallery-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.gallery-modal-close:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: scale(1.1);
+}
+
+.gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.gallery-nav:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.gallery-nav-prev {
+  left: 20px;
+}
+
+.gallery-nav-next {
+  right: 20px;
+}
+
+.gallery-nav.hidden {
+  display: none;
+}
+
+.gallery-modal-image-container {
+  position: relative;
+  width: 100%;
+  height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  overflow: hidden;
+}
+
+.gallery-modal-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: opacity 0.3s ease;
+  cursor: grab;
+}
+
+.gallery-modal-image:active {
+  cursor: grabbing;
+}
+
+.gallery-image-counter {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.gallery-modal-info {
+  padding: 30px;
+  text-align: center;
+  width: 100%;
+  background: var(--card);
+}
+
+.gallery-modal-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--fg);
+  margin-bottom: 10px;
+}
+
+.gallery-modal-description {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.gallery-thumbnails {
+  display: flex;
+  gap: 10px;
+  padding: 20px;
+  overflow-x: auto;
+  background: var(--card);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+  scroll-behavior: smooth;
+}
+
+.gallery-thumbnail {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  flex-shrink: 0;
+}
+
+.gallery-thumbnail:hover {
+  transform: scale(1.05);
+  border-color: var(--gold);
+}
+
+.gallery-thumbnail.active {
+  border-color: var(--gold);
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(229, 178, 93, 0.5);
+}
+
+/* Mobile Gallery Modal */
+@media (max-width: 768px) {
+  .gallery-modal-content {
+    width: 95%;
+    max-height: 95vh;
+    border-radius: 15px;
+  }
+  
+  .gallery-modal-close {
+    top: 15px;
+    right: 15px;
+    width: 35px;
+    height: 35px;
+    font-size: 20px;
+  }
+  
+  .gallery-nav {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+  
+  .gallery-nav-prev {
+    left: 15px;
+  }
+  
+  .gallery-nav-next {
+    right: 15px;
+  }
+  
+  .gallery-modal-image-container {
+    height: 50vh;
+  }
+  
+  .gallery-image-counter {
+    top: 15px;
+    left: 15px;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .gallery-modal-info {
+    padding: 20px;
+  }
+  
+  .gallery-modal-title {
+    font-size: 1.3rem;
+  }
+  
+  .gallery-modal-description {
+    font-size: 0.9rem;
+  }
+  
+  .gallery-thumbnails {
+    padding: 15px;
+    gap: 8px;
+  }
+  
+  .gallery-thumbnail {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+  .gallery-modal-content {
+    width: 98%;
+    max-height: 98vh;
+    border-radius: 10px;
+  }
+  
+  .gallery-modal-image-container {
+    height: 45vh;
+  }
+  
+  .gallery-modal-info {
+    padding: 15px;
+  }
+  
+  .gallery-modal-title {
+    font-size: 1.2rem;
+  }
+  
+  .gallery-thumbnails {
+    padding: 10px;
+    gap: 6px;
+  }
+  
+  .gallery-thumbnail {
+    width: 50px;
+    height: 50px;
+  }
+}

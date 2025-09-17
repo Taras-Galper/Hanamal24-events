@@ -5,7 +5,7 @@ import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import { layout, card } from "../src/templates.js";
 import { slugify, iso, money, first } from "../src/normalize.js";
-import { backupImages, getImageUrl, cleanupOldImages } from "./image-backup.js";
+import { processImages, cleanupOrphanedImages, getImageStats } from "./image-database.js";
 import { syncImagesToCloudinary, getOptimizedImageUrl } from "./cloudinary-sync.js";
 
 // Load environment variables from .env file
@@ -162,38 +162,46 @@ async function build() {
 
   console.log(`Found ${events.length} events, ${menus.length} menus, ${packages.length} packages, ${dishes.length} dishes, ${about.length} about records, ${hero.length} hero records, ${gallery.length} gallery items`);
   
-  // Sync images to Cloudinary for SEO and performance
+  // Process images with stable naming system
   let cloudinaryImageMap = new Map();
   let imageMap = new Map();
   
   if (hasAirtableCredentials) {
-    console.log('☁️ Starting Cloudinary sync...');
-    const cloudinaryResult = await syncImagesToCloudinary({ events, packages, dishes, gallery, hero, about });
-    cloudinaryImageMap = cloudinaryResult.imageMap;
+    console.log('🔄 Processing images with stable naming system...');
     
-    // Only run local backup if Cloudinary is not configured
-    if (cloudinaryResult.skipped === 'no-config') {
-      console.log("📸 Cloudinary not configured - using local backup system...");
+    // Check if Cloudinary is configured
+    const isCloudinaryConfigured = process.env.CLOUDINARY_CLOUD_NAME && 
+                                   process.env.CLOUDINARY_API_KEY && 
+                                   process.env.CLOUDINARY_API_SECRET;
+    
+    if (isCloudinaryConfigured) {
+      console.log('☁️ Cloudinary configured - using Cloudinary for image storage...');
+      const cloudinaryResult = await syncImagesToCloudinary({ events, packages, dishes, gallery, hero, about });
+      cloudinaryImageMap = cloudinaryResult.imageMap;
       
-      // Clean up old duplicate images first
-      console.log("🧹 Cleaning up old duplicate images...");
-      const cleanupResult = cleanupOldImages();
-      if (cleanupResult.removed > 0) {
-        console.log(`🗑️ Removed ${cleanupResult.removed} old duplicate images`);
+      // Save Cloudinary image map for monitoring
+      const cloudinaryImageMapObj = Object.fromEntries(cloudinaryImageMap);
+      writeFile(path.join(outDir, 'image-map.json'), JSON.stringify(cloudinaryImageMapObj, null, 2));
+    } else {
+      console.log('📸 Using local image database system...');
+      
+      // Process images with stable naming
+      const imageResult = await processImages({ events, packages, dishes, about, hero, gallery });
+      imageMap = imageResult.imageMap;
+      
+      // Clean up orphaned images
+      const orphanedCount = cleanupOrphanedImages(imageMap);
+      if (orphanedCount > 0) {
+        console.log(`🧹 Cleaned up ${orphanedCount} orphaned images`);
       }
-      
-      const backupResult = await backupImages({ events, packages, dishes, about, hero, gallery });
-      imageMap = backupResult.imageMap;
-      console.log(`✅ Image backup completed. ${backupResult.downloaded} new, ${backupResult.skipped} reused, ${backupResult.failed} failed.`);
       
       // Save image map for monitoring
       const imageMapObj = Object.fromEntries(imageMap);
       writeFile(path.join(outDir, 'image-map.json'), JSON.stringify(imageMapObj, null, 2));
-    } else {
-      console.log("☁️ Using Cloudinary images - skipping local backup");
-      // Save Cloudinary image map for monitoring
-      const imageMapObj = Object.fromEntries(cloudinaryImageMap);
-      writeFile(path.join(outDir, 'image-map.json'), JSON.stringify(imageMapObj, null, 2));
+      
+      // Show image statistics
+      const stats = getImageStats();
+      console.log(`📊 Image database: ${stats.totalImages} total images, ${stats.totalContentHashes} unique content hashes`);
     }
   }
   
@@ -565,7 +573,7 @@ async function build() {
     
     // Package modal HTML
     const packageModal = `
-      <div id="package-modal" class="package-modal" style="display: none;">
+      <div id="package-modal" class="package-modal">
         <div class="package-modal-overlay" onclick="closePackageModal()"></div>
         <div class="package-modal-content">
           <button class="package-modal-close" onclick="closePackageModal()">&times;</button>
@@ -596,7 +604,7 @@ async function build() {
     
     // Gallery modal HTML
     const galleryModal = `
-      <div id="gallery-modal" class="gallery-modal" style="display: none;">
+      <div id="gallery-modal" class="gallery-modal">
         <div class="gallery-modal-content">
           <button class="gallery-modal-close" onclick="closeGalleryModal()">&times;</button>
           

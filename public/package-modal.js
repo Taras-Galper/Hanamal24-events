@@ -57,7 +57,7 @@ class PackageModalHandler {
     this.populateModal(packageInfo);
     
     // Show modal
-    this.modal.classList.remove('hidden');
+    this.modal.classList.add('show');
     document.body.style.overflow = 'hidden';
   }
 
@@ -208,7 +208,7 @@ class PackageModalHandler {
 
   closeModal() {
     if (this.modal) {
-      this.modal.classList.add('hidden');
+      this.modal.classList.remove('show');
       document.body.style.overflow = 'auto';
     }
   }

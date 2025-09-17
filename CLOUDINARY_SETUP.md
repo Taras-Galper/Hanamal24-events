@@ -31,9 +31,9 @@ Add these lines to your `.env` file:
 
 ```env
 # Cloudinary Configuration (Free Account)
-CLOUDINARY_CLOUD_NAME=your-cloud-name-here
-CLOUDINARY_API_KEY=your-api-key-here
-CLOUDINARY_API_SECRET=your-api-secret-here
+CLOUDINARY_CLOUD_NAME=dtchyfhyf
+CLOUDINARY_API_KEY=425521945422548
+CLOUDINARY_API_SECRET=yiamiidGtZNsksn7gQbKngveU58A
 ```
 
 **Replace the placeholder values with your actual credentials!**

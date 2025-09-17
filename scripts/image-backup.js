@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import https from 'https';
 import { promisify } from 'util';
 import crypto from 'crypto';
+import { isUrlProcessed, registerUrl, getFilenameForUrl, getLocalPathForUrl, cleanupRegistry } from './image-registry.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const imagesDir = path.join(__dirname, '..', 'dist', 'images');
@@ -72,7 +73,16 @@ function generateFilename(url) {
 function imageExists(filename) {
   const distPath = path.join(imagesDir, filename);
   const publicPath = path.join(publicImagesDir, filename);
-  return fs.existsSync(distPath) || fs.existsSync(publicPath);
+  const distExists = fs.existsSync(distPath);
+  const publicExists = fs.existsSync(publicPath);
+  const exists = distExists || publicExists;
+  
+  if (exists) {
+    console.log(`✅ Image exists: ${filename} (dist: ${distExists}, public: ${publicExists})`);
+  } else {
+    console.log(`❌ Image not found: ${filename}`);
+  }
+  return exists;
 }
 
 // Clean up old duplicate images (optional cleanup function)
@@ -121,6 +131,8 @@ export async function backupImages(data) {
   ensureImagesDir();
   
   const imageMap = new Map();
+  const processedUrls = new Set(); // Track processed URLs to prevent duplicates
+  const allUrls = []; // Collect all URLs for registry cleanup
   let imageIndex = 0;
   
   // Process all records for images
@@ -141,10 +153,26 @@ export async function backupImages(data) {
         
         for (const img of images) {
           const imageUrl = img.url || img;
-          if (imageUrl && typeof imageUrl === 'string' && imageUrl.startsWith('http')) {
+          if (imageUrl && typeof imageUrl === 'string' && imageUrl.startsWith('http') && !processedUrls.has(imageUrl)) {
+            processedUrls.add(imageUrl); // Mark URL as processed
+            allUrls.push(imageUrl); // Add to cleanup list
+            
             const filename = generateFilename(imageUrl);
             const localPath = `/images/${filename}`;
             
+            // Check if file already exists (more reliable than URL registry for Airtable)
+            if (imageExists(filename)) {
+              imageMap.set(imageUrl, {
+                filename,
+                localPath,
+                recordType,
+                recordId: record.id,
+                exists: true
+              });
+              console.log(`♻️ Reusing existing file: ${filename}`);
+            } else {
+              console.log(`🆕 New image URL: ${imageUrl.substring(0, 50)}...`);
+              
             // Store mapping for later download
             imageMap.set(imageUrl, {
               filename,
@@ -153,6 +181,7 @@ export async function backupImages(data) {
               recordId: record.id,
               exists: imageExists(filename)
             });
+            }
           }
         }
       }
@@ -185,6 +214,9 @@ export async function backupImages(data) {
       const publicPath = path.join(publicImagesDir, info.filename);
       fs.copyFileSync(filePath, publicPath);
       
+      // Register the URL in the registry
+      registerUrl(originalUrl, info.filename);
+      
       console.log(`✅ Downloaded: ${info.filename}`);
       return { originalUrl, localPath: info.localPath, success: true };
     } catch (error) {
@@ -215,7 +247,10 @@ export async function backupImages(data) {
   if (failed.length > 0) {
     console.log(`⚠️ Failed to backup ${failed.length} images`);
   }
-  
+
+  // Clean up registry (remove entries for URLs that no longer exist)
+  cleanupRegistry(allUrls);
+
   return {
     imageMap: finalImageMap,
     failed: failed.length,

@@ -11,12 +11,18 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+// Configure Cloudinary function
+function configureCloudinary() {
+  if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET
+    });
+    return true;
+  }
+  return false;
+}
 
 // Generate consistent public_id for images
 function generatePublicId(imageUrl) {
@@ -66,7 +72,10 @@ async function uploadToCloudinary(imageUrl, publicId) {
 
 // Main sync function
 export async function syncImagesToCloudinary(data) {
-  if (!process.env.CLOUDINARY_CLOUD_NAME) {
+  // Configure Cloudinary first
+  const isConfigured = configureCloudinary();
+  
+  if (!isConfigured) {
     console.log('📸 Cloudinary not configured - using local backup system');
     return { imageMap: new Map(), skipped: 'no-config' };
   }

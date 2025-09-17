@@ -104,7 +104,7 @@ class GalleryModalHandler {
     this.updateNavigationButtons();
 
     // Show modal
-    this.galleryModal.classList.remove('hidden');
+    this.galleryModal.classList.add('show');
     document.body.style.overflow = 'hidden';
 
     // Add fade-in animation
@@ -120,7 +120,7 @@ class GalleryModalHandler {
     this.galleryModal.style.opacity = '0';
     
     setTimeout(() => {
-      this.galleryModal.classList.add('hidden');
+      this.galleryModal.classList.remove('show');
       document.body.style.overflow = '';
     }, 300);
   }
