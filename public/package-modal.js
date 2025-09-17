@@ -57,7 +57,7 @@ class PackageModalHandler {
     this.populateModal(packageInfo);
     
     // Show modal
-    this.modal.style.display = 'flex';
+    this.modal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
   }
 
@@ -77,9 +77,9 @@ class PackageModalHandler {
       const packagePrice = packageInfo["מחיר (Price)"] || packageInfo.Price;
       if (packagePrice) {
         price.textContent = this.formatPrice(packagePrice);
-        price.style.display = 'block';
+        price.classList.remove('hidden');
       } else {
-        price.style.display = 'none';
+        price.classList.add('hidden');
       }
     }
 
@@ -208,7 +208,7 @@ class PackageModalHandler {
 
   closeModal() {
     if (this.modal) {
-      this.modal.style.display = 'none';
+      this.modal.classList.add('hidden');
       document.body.style.overflow = 'auto';
     }
   }

@@ -2094,6 +2094,11 @@ footer p {
   }
 }
 
+/* Hidden utility class */
+.hidden {
+  display: none !important;
+}
+
 /* Gallery Image Modal */
 .gallery-modal {
   position: fixed;

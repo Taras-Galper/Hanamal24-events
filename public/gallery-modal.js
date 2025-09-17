@@ -104,7 +104,7 @@ class GalleryModalHandler {
     this.updateNavigationButtons();
 
     // Show modal
-    this.galleryModal.style.display = 'flex';
+    this.galleryModal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
 
     // Add fade-in animation
@@ -120,7 +120,7 @@ class GalleryModalHandler {
     this.galleryModal.style.opacity = '0';
     
     setTimeout(() => {
-      this.galleryModal.style.display = 'none';
+      this.galleryModal.classList.add('hidden');
       document.body.style.overflow = '';
     }, 300);
   }
@@ -179,8 +179,8 @@ class GalleryModalHandler {
   }
 
   updateNavigationButtons() {
-    this.prevBtn.style.display = this.currentImageIndex > 0 ? 'flex' : 'none';
-    this.nextBtn.style.display = this.currentImageIndex < this.galleryData.length - 1 ? 'flex' : 'none';
+    this.prevBtn.classList.toggle('hidden', this.currentImageIndex <= 0);
+    this.nextBtn.classList.toggle('hidden', this.currentImageIndex >= this.galleryData.length - 1);
   }
 
   generateThumbnails() {
@@ -218,7 +218,7 @@ class GalleryModalHandler {
     if (imagesToLoad.length === 0) {
       // Hide the button if no more images
       if (this.viewMoreBtn) {
-        this.viewMoreBtn.style.display = 'none';
+        this.viewMoreBtn.classList.add('hidden');
       }
       return;
     }
@@ -254,7 +254,7 @@ class GalleryModalHandler {
     if (remainingCount <= 0) {
       // Hide button if all images are loaded
       if (this.viewMoreBtn) {
-        this.viewMoreBtn.style.display = 'none';
+        this.viewMoreBtn.classList.add('hidden');
       }
     } else {
       // Update button text with remaining count
