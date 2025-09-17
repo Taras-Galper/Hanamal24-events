@@ -1345,7 +1345,7 @@ footer p {
   /* Contact Section */
   .contact {
     padding: 60px 0;
-    min-height: auto;
+    min-height: 0;
   }
   
   .contact-content {

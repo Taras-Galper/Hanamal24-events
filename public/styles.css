@@ -2191,8 +2191,6 @@ footer p {
   max-width: 100%;
   overflow-x: auto;
   padding: 10px 0;
-  scrollbar-width: thin;
-  scrollbar-color: var(--accent) transparent;
 }
 
 .gallery-thumbnails::-webkit-scrollbar {
