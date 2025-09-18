@@ -1632,21 +1632,45 @@ footer p {
     padding: 60px 20px;
   }
   
+  .packages-container {
+    overflow: hidden;
+  }
+  
   .packages-title {
     font-size: 2rem;
     margin-bottom: 30px;
   }
   
   .packages-grid {
-    grid-template-columns: repeat(4, 1fr);
+    display: flex;
     gap: 15px;
     overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  
+  .packages-grid::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  .packages-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+  
+  .packages-grid::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 3px;
   }
   
   .package-card {
     padding: 20px 15px;
     height: 300px;
-    min-width: 200px;
+    min-width: 250px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
   }
   
   .package-title {
