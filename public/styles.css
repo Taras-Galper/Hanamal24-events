@@ -1446,73 +1446,121 @@ footer p {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  /* Header - Single line layout */
-  .header {
-    padding: 15px 0;
+  /* Header - Responsive mobile layout */
+  header {
+    padding: 12px 0;
   }
   
   .header-content {
-    padding: 0 15px;
+    padding: 0 10px;
     flex-direction: row;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
+    justify-content: space-between;
   }
   
   .header-left {
     flex: 0 0 auto;
-    justify-content: flex-start;
+    order: 1;
   }
   
   .header-center {
     flex: 1;
     justify-content: center;
     order: 2;
+    min-width: 0;
   }
   
   .header-right {
     flex: 0 0 auto;
-    justify-content: flex-end;
     order: 3;
   }
   
-  /* Logo - Make it bigger on mobile */
+  /* Logo - Responsive sizing */
   .brand {
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     font-weight: 700;
+    letter-spacing: 1px;
   }
   
-  /* Navigation - Single line, smaller */
+  /* Navigation - Responsive scaling */
   .nav {
-    gap: 8px;
+    gap: 4px;
     flex-wrap: nowrap;
     justify-content: center;
     overflow-x: auto;
     scroll-behavior: smooth;
+    padding: 0 5px;
   }
   
   .nav a {
-    font-size: 0.8rem;
-    padding: 6px 8px;
+    font-size: 0.7rem;
+    padding: 4px 6px;
     white-space: nowrap;
     flex-shrink: 0;
+    border-radius: 12px;
+    transition: all 0.3s ease;
   }
   
-  /* Order Now button - Smaller and proportional */
-  .btn {
+  .nav a:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Book button - Responsive sizing */
+  .book-btn {
     padding: 6px 12px;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     border-radius: 15px;
-    min-height: 28px;
+    min-width: 60px;
+    text-align: center;
   }
   
   .brand-logo {
-    height: 32px;
+    height: 28px;
   }
   
-  .book-btn {
-    padding: 8px 16px;
-    font-size: 0.8rem;
-    border-radius: 20px;
+  /* Extra small screens - further optimization */
+  @media (max-width: 480px) {
+    .header-content {
+      padding: 0 8px;
+      gap: 6px;
+    }
+    
+    .brand {
+      font-size: 1.2rem;
+    }
+    
+    .nav {
+      gap: 2px;
+      padding: 0 3px;
+    }
+    
+    .nav a {
+      font-size: 0.65rem;
+      padding: 3px 5px;
+    }
+    
+    .book-btn {
+      padding: 5px 10px;
+      font-size: 0.65rem;
+      min-width: 50px;
+    }
+    
+    .brand-logo {
+      height: 24px;
+    }
+    
+    /* Packages - Single column on very small screens */
+    .packages-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 0 10px;
+    }
+    
+    .package-card {
+      height: 160px;
+      padding: 10px 8px;
+    }
   }
   
   /* Hero Carousel */
@@ -1657,15 +1705,16 @@ footer p {
   
   .packages-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 0 5px;
   }
   
-  
   .package-card {
-    padding: 15px 12px;
-    height: 200px;
+    padding: 12px 8px;
+    height: 180px;
     width: 100%;
+    min-width: 0;
   }
   
   .package-title {
