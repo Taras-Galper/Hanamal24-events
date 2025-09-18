@@ -1575,19 +1575,19 @@ footer p {
   
   .categories-grid {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     overflow-x: auto;
     padding-bottom: 10px;
     scroll-snap-type: x mandatory;
-    justify-content: center;
-    padding: 0 10px;
+    padding: 0 5px;
   }
   
   .category-card {
-    padding: 15px 10px;
-    min-width: 120px;
-    max-width: 130px;
-    flex-shrink: 0;
+    padding: 12px 8px;
+    flex: 0 0 auto;
+    width: calc(25vw - 10px);
+    min-width: 100px;
+    max-width: 140px;
     scroll-snap-align: start;
   }
   
@@ -1656,37 +1656,44 @@ footer p {
   }
   
   .packages-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-snap-type: x mandatory;
+    padding: 0 5px;
   }
   
   
   .package-card {
-    padding: 15px 12px;
-    height: 220px;
-    width: 100%;
+    padding: 12px 8px;
+    height: 200px;
+    flex: 0 0 auto;
+    width: calc(50vw - 15px);
+    min-width: 160px;
+    max-width: 200px;
+    scroll-snap-align: start;
   }
   
   .package-title {
-    font-size: 1rem;
-    margin-bottom: 4px;
+    font-size: 0.9rem;
+    margin-bottom: 3px;
   }
   
   .package-price {
-    font-size: 0.9rem;
-    margin-bottom: 6px;
+    font-size: 0.8rem;
+    margin-bottom: 4px;
   }
   
   .package-description {
-    font-size: 0.75rem;
-    margin-bottom: 8px;
-    line-height: 1.3;
+    font-size: 0.7rem;
+    margin-bottom: 6px;
+    line-height: 1.2;
   }
   
   .package-link {
-    padding: 6px 12px;
-    font-size: 0.75rem;
+    padding: 4px 8px;
+    font-size: 0.7rem;
   }
   
   /* Contact Section */
