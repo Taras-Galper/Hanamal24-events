@@ -1078,8 +1078,8 @@ main {
 
 .categories-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
   margin-bottom: 80px;
 }
 
@@ -1562,6 +1562,7 @@ footer p {
   /* Event Categories */
   .event-categories {
     padding: 60px 20px;
+    overflow: hidden;
   }
   
   .event-categories h2 {
@@ -1570,21 +1571,29 @@ footer p {
   }
   
   .categories-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
   }
   
   .category-card {
-    padding: 25px 20px;
+    padding: 20px 15px;
+    min-width: 140px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
   }
   
   .category-card h3 {
-    font-size: 1.3rem;
-    margin-bottom: 10px;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
   }
   
   .category-card p {
-    font-size: 0.95rem;
+    font-size: 0.8rem;
+    line-height: 1.4;
   }
   
   /* About Section */
