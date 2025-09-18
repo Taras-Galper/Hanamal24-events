@@ -1576,7 +1576,6 @@ footer p {
     overflow-x: auto;
     padding-bottom: 10px;
     scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
   }
   
   .category-card {
