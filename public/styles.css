@@ -740,23 +740,7 @@ main {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-.dish-image-container {
-  width: 100%;
-  height: 150px;
-  overflow: hidden;
-  position: relative;
-}
-
-.dish-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.package-menu-item:hover .dish-image {
-  transform: scale(1.05);
-}
+/* Dish image styles removed - images no longer displayed for menu items */
 
 .dish-content {
   padding: 20px;

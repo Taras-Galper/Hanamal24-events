@@ -5,8 +5,7 @@ import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import { layout, card } from "../src/templates.js";
 import { slugify, iso, money, first } from "../src/normalize.js";
-import { processImages, cleanupOrphanedImages, getImageStats } from "./image-database.js";
-import { syncImagesToCloudinary, getOptimizedImageUrl } from "./cloudinary-sync.js";
+// Image processing imports removed - images no longer pulled from Airtable
 
 // Load environment variables from .env file
 dotenv.config();
@@ -81,31 +80,7 @@ function siteMeta() {
 }
 
 function firstImageFrom(record, cloudinaryImageMap = null, localImageMap = null) {
-  const imageFields = [
-    "תמונה (Image)", "Image", "תמונה", "Picture", "Photo", 
-    "תמונה של המנה", "Event Photos"
-  ];
-  
-  for (const field of imageFields) {
-    if (record[field]) {
-      const images = Array.isArray(record[field]) ? record[field] : [record[field]];
-      for (const img of images) {
-        const originalUrl = img.url || img;
-        if (originalUrl && typeof originalUrl === 'string' && originalUrl.startsWith('http')) {
-          // Use Cloudinary optimized URL if available
-          if (cloudinaryImageMap && cloudinaryImageMap.has(originalUrl)) {
-            return cloudinaryImageMap.get(originalUrl);
-          }
-          // Fallback to local backup
-          if (localImageMap && localImageMap.has(originalUrl)) {
-            return localImageMap.get(originalUrl);
-          }
-          // Fallback to original URL
-          return originalUrl;
-        }
-      }
-    }
-  }
+  // Images are no longer pulled from Airtable - return default placeholder
   return "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&h=600&fit=crop";
 }
 
@@ -162,48 +137,9 @@ async function build() {
 
   console.log(`Found ${events.length} events, ${menus.length} menus, ${packages.length} packages, ${dishes.length} dishes, ${about.length} about records, ${hero.length} hero records, ${gallery.length} gallery items`);
   
-  // Process images with stable naming system
+  // Images are no longer processed from Airtable
   let cloudinaryImageMap = new Map();
   let imageMap = new Map();
-  
-  if (hasAirtableCredentials) {
-    console.log('🔄 Processing images with stable naming system...');
-    
-    // Check if Cloudinary is configured
-    const isCloudinaryConfigured = process.env.CLOUDINARY_CLOUD_NAME && 
-                                   process.env.CLOUDINARY_API_KEY && 
-                                   process.env.CLOUDINARY_API_SECRET;
-    
-    if (isCloudinaryConfigured) {
-      console.log('☁️ Cloudinary configured - using Cloudinary for image storage...');
-      const cloudinaryResult = await syncImagesToCloudinary({ events, packages, dishes, gallery, hero, about });
-      cloudinaryImageMap = cloudinaryResult.imageMap;
-      
-      // Save Cloudinary image map for monitoring
-      const cloudinaryImageMapObj = Object.fromEntries(cloudinaryImageMap);
-      writeFile(path.join(outDir, 'image-map.json'), JSON.stringify(cloudinaryImageMapObj, null, 2));
-    } else {
-      console.log('📸 Using local image database system...');
-      
-      // Process images with stable naming
-      const imageResult = await processImages({ events, packages, dishes, about, hero, gallery });
-      imageMap = imageResult.imageMap;
-      
-      // Clean up orphaned images
-      const orphanedCount = cleanupOrphanedImages(imageMap);
-      if (orphanedCount > 0) {
-        console.log(`🧹 Cleaned up ${orphanedCount} orphaned images`);
-      }
-      
-      // Save image map for monitoring
-      const imageMapObj = Object.fromEntries(imageMap);
-      writeFile(path.join(outDir, 'image-map.json'), JSON.stringify(imageMapObj, null, 2));
-      
-      // Show image statistics
-      const stats = getImageStats();
-      console.log(`📊 Image database: ${stats.totalImages} total images, ${stats.totalContentHashes} unique content hashes`);
-    }
-  }
   
   // Add fallback content if no Airtable data
   const fallbackHero = [{
@@ -789,7 +725,7 @@ async function build() {
 
   // per-package
   for (const p of Object.values(pkgMap)) {
-    const packageImage = p["תמונה (Image)"] ? (Array.isArray(p["תמונה (Image)"]) ? p["תמונה (Image)"][0].url : p["תמונה (Image)"]) : null;
+    const packageImage = firstImageFrom(p, cloudinaryImageMap, imageMap);
     const body = `
       <article>
         <h1>${p["שם חבילה (Package Name)"] || p.Title || p.Name}</h1>

@@ -273,41 +273,11 @@ class GalleryModalHandler {
   }
 
   getImageUrl(item) {
-    // Helper function to get image URL from various possible field names
-    const imageFields = [
-      "תמונה (Image)",
-      "Image", 
-      "תמונה",
-      "Picture",
-      "Photo",
-      "תמונה של המנה"
-    ];
-    
-    for (const field of imageFields) {
-      if (item[field]) {
-        if (Array.isArray(item[field])) {
-          const imageUrl = item[field][0]?.url || item[field][0];
-          if (imageUrl) {
-            // Try local backup first, then fallback to original
-            return this.getLocalImagePath(imageUrl) || imageUrl;
-          }
-        } else if (typeof item[field] === 'string') {
-          return this.getLocalImagePath(item[field]) || item[field];
-        }
-      }
-    }
-    
-    return "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&h=600&fit=crop"; // Fallback
+    // Images are no longer pulled from Airtable - return default placeholder
+    return "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&h=600&fit=crop";
   }
 
-  getLocalImagePath(originalUrl) {
-    // Check if we have a local backup of this image
-    // This would be populated by the build process
-    if (window.imageMap && window.imageMap[originalUrl]) {
-      return window.imageMap[originalUrl];
-    }
-    return null;
-  }
+  // getLocalImagePath method removed - images no longer pulled from Airtable
 }
 
 // Initialize gallery modal handler
