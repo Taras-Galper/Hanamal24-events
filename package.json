@@ -9,7 +9,8 @@
     "start": "node scripts/serve.js",
     "dev": "node scripts/build.js && npx serve dist -p 3000",
     "clean": "rm -rf dist",
-    "check-images": "node scripts/check-images.js"
+    "check-images": "node scripts/check-images.js",
+    "deploy": "node deploy-to-github-pages.js"
   },
   "dependencies": {
     "dotenv": "^17.2.2",

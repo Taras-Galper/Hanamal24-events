@@ -88,6 +88,11 @@ class GalleryModalHandler {
     this.currentImageIndex = imageIndex;
     this.isModalOpen = true;
     
+    // Track gallery view
+    document.dispatchEvent(new CustomEvent('galleryImageOpened', {
+      detail: { imageTitle: title, imageIndex: imageIndex }
+    }));
+    
     // Set modal content
     this.modalImage.src = imageUrl;
     this.modalImage.alt = title;
@@ -129,6 +134,11 @@ class GalleryModalHandler {
     if (this.currentImageIndex < this.galleryData.length - 1) {
       this.currentImageIndex++;
       this.updateImage();
+      
+      // Track gallery navigation
+      document.dispatchEvent(new CustomEvent('galleryNavigation', {
+        detail: { direction: 'next', imageIndex: this.currentImageIndex }
+      }));
     }
   }
 
@@ -136,6 +146,11 @@ class GalleryModalHandler {
     if (this.currentImageIndex > 0) {
       this.currentImageIndex--;
       this.updateImage();
+      
+      // Track gallery navigation
+      document.dispatchEvent(new CustomEvent('galleryNavigation', {
+        detail: { direction: 'previous', imageIndex: this.currentImageIndex }
+      }));
     }
   }
 

@@ -20,11 +20,21 @@ export function layout({ title, description, body, url, image, jsonld, site }) {
 <meta property="og:image" content="${ogImage}">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="styles.css">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WYN0CWD8ZC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-WYN0CWD8ZC');
+</script>
 <script src="config.js" defer></script>
+<script src="analytics-config.js" defer></script>
 <script src="hero-carousel.js" defer></script>
 <script src="contact-form.js" defer></script>
 <script src="package-modal.js" defer></script>
 <script src="gallery-modal.js" defer></script>
+<script src="analytics.js" defer></script>
 ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script>` : ""}
 </head>
 <body>

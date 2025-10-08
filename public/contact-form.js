@@ -43,6 +43,11 @@ class ContactFormHandler {
     if (!isValid) {
       field.classList.add('error');
       this.showFieldError(field, this.getValidationMessage(field));
+      
+      // Track validation error
+      document.dispatchEvent(new CustomEvent('formValidationError', {
+        detail: { field: field.name, error: this.getValidationMessage(field) }
+      }));
     } else {
       field.classList.remove('error');
       this.clearFieldError(event);
@@ -106,6 +111,12 @@ class ContactFormHandler {
       
       // Show success message
       this.showMessage('הבקשה נשלחה בהצלחה! נחזור אליכם בהקדם.', 'success');
+      
+      // Track form submission
+      document.dispatchEvent(new CustomEvent('formSubmitted', {
+        detail: { formType: 'contact', leadData }
+      }));
+      
       this.form.reset();
       
     } catch (error) {

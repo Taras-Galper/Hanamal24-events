@@ -127,7 +127,10 @@ async function build() {
   
   const [events, menus, packages, dishes, about, hero, gallery] = await Promise.all([
     fetchAll("Events"),
-    fetchAll("Menus"),
+    fetchAll("Menus").catch(err => {
+      console.warn("⚠️  Could not fetch Menus table - using fallback content");
+      return [];
+    }),
     fetchAll("tbl9C40JxeIkue5So"), // Correct Packages table ID
     fetchAll("tblbi9b9lUjRRrAhW"), // Correct Dishes table ID
     fetchAll("tblvhDaSZbzlYP9bh"), // Correct About table ID
@@ -169,6 +172,21 @@ async function build() {
     }
   ];
   
+  const fallbackMenus = [
+    {
+      "Title": "תפריט ערב",
+      "Description": "תפריט ערב מגוון עם מנות צרפתיות קלאסיות",
+      "slug": "evening-menu",
+      "Dishes": []
+    },
+    {
+      "Title": "תפריט אירועים",
+      "Description": "תפריט מיוחד לאירועים וחגיגות",
+      "slug": "events-menu", 
+      "Dishes": []
+    }
+  ];
+  
   const fallbackGallery = [
     {
       "תמונה (Image)": "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&h=600&fit=crop",
@@ -194,14 +212,15 @@ async function build() {
   const finalHero = hero.length > 0 ? hero : fallbackHero;
   const finalAbout = about.length > 0 ? about : fallbackAbout;
   const finalPackages = packages.length > 0 ? packages : fallbackPackages;
+  const finalMenus = menus.length > 0 ? menus : fallbackMenus;
   const finalGallery = gallery.length > 0 ? gallery : fallbackGallery;
 
   const dishMap = Object.fromEntries(dishes.map(d => [d.id, d]));
   const menuMap = Object.fromEntries(
-    menus.map(m => {
+    finalMenus.map((m, index) => {
       const slug = m.slug || slugify(m.Title || m.Name);
       const items = (m.Dishes || []).map(id => dishMap[id]).filter(Boolean);
-      return [m.id, { ...m, slug, items }];
+      return [m.id || `fallback-menu-${index}`, { ...m, slug, items }];
     })
   );
 
@@ -532,7 +551,7 @@ async function build() {
             </div>
           </div>
           <div class="package-modal-footer">
-            <button class="package-modal-cta" onclick="scrollToContact()">הזמן עכשיו</button>
+            <button class="package-modal-cta" onclick="scrollToContact(); document.dispatchEvent(new CustomEvent('packageCTAClicked', {detail: {packageName: document.getElementById('modal-package-title')?.textContent}}))">הזמן עכשיו</button>
           </div>
         </div>
       </div>

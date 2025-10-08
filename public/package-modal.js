@@ -48,6 +48,16 @@ class PackageModalHandler {
       pkg.id === packageId || pkg.slug === packageId
     );
 
+    // Track package view
+    if (packageInfo) {
+      document.dispatchEvent(new CustomEvent('packageModalOpened', {
+        detail: { 
+          packageId, 
+          packageName: packageInfo["שם חבילה (Package Name)"] || packageInfo.Title || packageInfo.Name 
+        }
+      }));
+    }
+
     if (!packageInfo) {
       console.error('Package not found:', packageId);
       return;

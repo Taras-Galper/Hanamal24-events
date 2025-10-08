@@ -298,10 +298,10 @@ class ContactFormHandler {
     `;
     
     instructionsDiv.innerHTML = `
-      <h4 style="color: #d4af37; margin-bottom: 15px;">🔧 Setup Instructions for Automatic Airtable Submission</h4>
+      <h4 class="setup-title">🔧 Setup Instructions for Automatic Airtable Submission</h4>
       <p><strong>Current Status:</strong> Contact form is working but leads are stored locally only.</p>
       <p><strong>To enable automatic Airtable submission:</strong></p>
-      <ol style="margin: 10px 0; padding-right: 20px;">
+      <ol class="setup-steps">
         <li>Set up Make.com webhook (see MAKECOM_SETUP_GUIDE.md)</li>
         <li>Get your webhook URL from Make.com</li>
         <li>Update public/config.js with your webhook URL</li>
