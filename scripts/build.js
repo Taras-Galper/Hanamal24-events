@@ -33,6 +33,7 @@ if (!hasAirtableCredentials) {
 
 const outDir = path.join(__dirname, "..", "dist");
 const publicDir = path.join(__dirname, "..", "public");
+const dataDir = path.join(__dirname, "..", "data");
 
 function ensureDir(dir) { fs.mkdirSync(dir, { recursive: true }); }
 function writeFile(p, content) { ensureDir(path.dirname(p)); fs.writeFileSync(p, content, "utf8"); }
@@ -40,6 +41,24 @@ function copyStatic() {
   ensureDir(outDir);
   // copy public assets flat into dist
   fs.cpSync(publicDir, outDir, { recursive: true });
+}
+
+// Load data from local JSON files (NO API CALLS)
+function loadJsonData(filename) {
+  try {
+    const dataPath = path.join(dataDir, filename);
+    if (fs.existsSync(dataPath)) {
+      const data = fs.readFileSync(dataPath, 'utf8');
+      const parsed = JSON.parse(data);
+      console.log(`✅ Loaded ${filename}: ${Array.isArray(parsed) ? parsed.length : Object.keys(parsed).length} items`);
+      return parsed;
+    } else {
+      console.log(`⚠️  ${filename} not found`);
+    }
+  } catch (error) {
+    console.error(`❌ Error loading ${filename}:`, error.message);
+  }
+  return null;
 }
 
 async function fetchAll(table, view = "Grid view") {
@@ -119,26 +138,45 @@ async function build() {
   if (fs.existsSync(outDir)) fs.rmSync(outDir, { recursive: true, force: true });
   copyStatic();
 
-  if (hasAirtableCredentials) {
-    console.log("Fetching data from Airtable...");
-  } else {
-    console.log("Using static fallback content (no Airtable credentials)");
-  }
+  console.log("📂 Loading data from local JSON files (no API calls)...");
   
-  const [events, menus, packages, dishes, about, hero, gallery] = await Promise.all([
-    fetchAll("Events"),
-    fetchAll("Menus").catch(err => {
-      console.warn("⚠️  Could not fetch Menus table - using fallback content");
-      return [];
-    }),
-    fetchAll("tbl9C40JxeIkue5So"), // Correct Packages table ID
-    fetchAll("tblbi9b9lUjRRrAhW"), // Correct Dishes table ID
-    fetchAll("tblvhDaSZbzlYP9bh"), // Correct About table ID
-    fetchAll("tblOe7ONKtB6A9Q6L"), // Hero table ID
-    fetchAll("tblpfVJY9nEb5JDlQ") // Gallery table ID
-  ]);
+  // Try to load from JSON files first (MAKECOM EXPORTS DATA HERE)
+  let events = loadJsonData("events.json");
+  let menus = loadJsonData("menus.json");
+  let packages = loadJsonData("packages.json");
+  let dishes = loadJsonData("dishes.json");
+  let about = loadJsonData("about.json");
+  let hero = loadJsonData("hero.json");
+  let gallery = loadJsonData("gallery.json");
+  
+  // If JSON files not found, try fetching from Airtable API (fallback)
+  const hasJsonData = events !== null || menus !== null || packages !== null;
+  if (!hasJsonData && hasAirtableCredentials) {
+    console.log("⚠️  No JSON files found, falling back to Airtable API...");
+    [events, menus, packages, dishes, about, hero, gallery] = await Promise.all([
+      fetchAll("Events"),
+      fetchAll("Menus").catch(err => {
+        console.warn("⚠️  Could not fetch Menus table - using fallback content");
+        return [];
+      }),
+      fetchAll("tbl9C40JxeIkue5So"), // Correct Packages table ID
+      fetchAll("tblbi9b9lUjRRrAhW"), // Correct Dishes table ID
+      fetchAll("tblvhDaSZbzlYP9bh"), // Correct About table ID
+      fetchAll("tblOe7ONKtB6A9Q6L"), // Hero table ID
+      fetchAll("tblpfVJY9nEb5JDlQ") // Gallery table ID
+    ]);
+  } else if (!hasJsonData && !hasAirtableCredentials) {
+    console.log("⚠️  No JSON files or Airtable credentials - using fallback content");
+    events = events || [];
+    menus = menus || [];
+    packages = packages || [];
+    dishes = dishes || [];
+    about = about || [];
+    hero = hero || [];
+    gallery = gallery || [];
+  }
 
-  console.log(`Found ${events.length} events, ${menus.length} menus, ${packages.length} packages, ${dishes.length} dishes, ${about.length} about records, ${hero.length} hero records, ${gallery.length} gallery items`);
+  console.log(`Found ${events?.length || 0} events, ${menus?.length || 0} menus, ${packages?.length || 0} packages, ${dishes?.length || 0} dishes, ${about?.length || 0} about records, ${hero?.length || 0} hero records, ${gallery?.length || 0} gallery items`);
   
   // Images are no longer processed from Airtable
   let cloudinaryImageMap = new Map();
