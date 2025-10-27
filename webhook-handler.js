@@ -43,16 +43,22 @@ export default async function handler(req, res) {
 
     // 2. Trigger Render.com deployment
     try {
+      console.log('Triggering Render.com deployment...');
       const renderResponse = await fetch('https://api.render.com/deploy/srv-d1rnnkp5pdvs73ebjcc0?key=h0hONC2Ttt8', {
         method: 'POST'
       });
+      
+      const responseText = await renderResponse.text();
+      console.log('Render.com response:', renderResponse.status, responseText);
 
       results.render = {
         success: renderResponse.ok,
         status: renderResponse.status,
-        message: renderResponse.ok ? 'Render.com deployment triggered' : 'Render.com deployment failed'
+        message: renderResponse.ok ? 'Render.com deployment triggered' : `Render.com deployment failed: ${responseText}`,
+        details: responseText
       };
     } catch (error) {
+      console.error('Render.com error:', error);
       results.render = { success: false, error: error.message };
     }
 
