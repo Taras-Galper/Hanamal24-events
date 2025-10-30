@@ -1,0 +1,46 @@
+name: Sync Airtable and Build
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 5 * * *' # daily at 05:00 UTC
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps
+        run: npm ci || npm i
+
+      - name: Sync Airtable -> data
+        env:
+          AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
+          AIRTABLE_BASE: ${{ secrets.AIRTABLE_BASE }}
+        run: npm run sync
+
+      - name: Commit synced data (if changed)
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/*.json || true
+          git diff --cached --quiet || git commit -m "chore(data): sync from Airtable"
+          git push || true
+
+      - name: Build site
+        env:
+          BASE_URL: ${{ vars.BASE_URL }}
+          SITE_NAME: ${{ vars.SITE_NAME }}
+          SITE_CITY: ${{ vars.SITE_CITY }}
+          SITE_COUNTRY: ${{ vars.SITE_COUNTRY }}
+          CUISINE: ${{ vars.CUISINE }}
+        run: npm run build
+
+
