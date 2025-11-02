@@ -138,21 +138,14 @@ async function build() {
   if (fs.existsSync(outDir)) fs.rmSync(outDir, { recursive: true, force: true });
   copyStatic();
 
-  console.log("📂 Loading data from local JSON files (no API calls)...");
+  console.log("📂 Loading data from Airtable (fresh data on every build)...");
   
-  // Try to load from JSON files first (MAKECOM EXPORTS DATA HERE)
-  let events = loadJsonData("events.json");
-  let menus = loadJsonData("menus.json");
-  let packages = loadJsonData("packages.json");
-  let dishes = loadJsonData("dishes.json");
-  let about = loadJsonData("about.json");
-  let hero = loadJsonData("hero.json");
-  let gallery = loadJsonData("gallery.json");
+  // Always fetch fresh data from Airtable if credentials are available
+  // This ensures the site is always up-to-date when you're paying for Airtable
+  let events, menus, packages, dishes, about, hero, gallery;
   
-  // If JSON files not found, try fetching from Airtable API (fallback)
-  const hasJsonData = events !== null || menus !== null || packages !== null;
-  if (!hasJsonData && hasAirtableCredentials) {
-    console.log("⚠️  No JSON files found, falling back to Airtable API...");
+  if (hasAirtableCredentials) {
+    console.log("✅ Fetching fresh data from Airtable API...");
     [events, menus, packages, dishes, about, hero, gallery] = await Promise.all([
       fetchAll("Events"),
       fetchAll("Menus").catch(err => {
@@ -165,8 +158,19 @@ async function build() {
       fetchAll("tblOe7ONKtB6A9Q6L"), // Hero table ID
       fetchAll("tblpfVJY9nEb5JDlQ") // Gallery table ID
     ]);
-  } else if (!hasJsonData && !hasAirtableCredentials) {
-    console.log("⚠️  No JSON files or Airtable credentials - using fallback content");
+    console.log("✅ Successfully fetched fresh data from Airtable");
+  } else {
+    // Fallback to JSON files if no Airtable credentials
+    console.log("⚠️  No Airtable credentials - loading from local JSON files...");
+    events = loadJsonData("events.json");
+    menus = loadJsonData("menus.json");
+    packages = loadJsonData("packages.json");
+    dishes = loadJsonData("dishes.json");
+    about = loadJsonData("about.json");
+    hero = loadJsonData("hero.json");
+    gallery = loadJsonData("gallery.json");
+    
+    // Use empty arrays if JSON files not found
     events = events || [];
     menus = menus || [];
     packages = packages || [];
