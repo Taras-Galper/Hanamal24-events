@@ -1,2 +1,329 @@
-[]
-
+[
+  {
+    "id": "recu1vOZ91cN5kfTN",
+    "Event Name": "Johnson Birthday Bash",
+    "Client": [
+      "rec6O8fWqyX8OgqHl"
+    ],
+    "Event Date": "2025-09-21",
+    "Start Time": "18:00",
+    "End Time": "22:00",
+    "Event Type": "Birthday",
+    "Number of Guests": 45,
+    "Requirements": "Vegetarian menu, birthday cake, projector for slideshow, kids play area",
+    "Event Photos": [
+      {
+        "id": "attZ6kLO8TI4qEJOE",
+        "width": 600,
+        "height": 401,
+        "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/1y4fo8Fi2dAFBZ9ltIcwcQ/hqJJrEId099JFmy3cnri5nUxPkmJyVpZNH3oqoyQDs5fkxWZuOAgdAuGQb_k6Ouqh5YJhaqKBNmWar7v0ELIDnBntNDhSdLtCDRstQTcIEeOmLmpXr-mPeA1Vg7mi2HwvBlTJsCrTNFca6-6QWpbIMeITj7DSYVqqMgyHkFfJvg/oOPei8ZYeEzdFY0ea99imeH5VIIO6d2s8r-FLpu-mnI",
+        "filename": "abstract_18.png",
+        "size": 320386,
+        "type": "image/png",
+        "thumbnails": {
+          "small": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/Qyqbap2M7mIlgWgQgBy1bg/ZMRd2A7q-PPEVqyfsWw3oof0kGgKF6-JSB9aegrL8eWAIY-Boqe2LqfRkGIraH8N9OXPZKcO2sDIBqt3PBf-sPQ_xoPAwzI1VpDhJgpV2gTmY7GPTjMtkR9OwCZx8EhfH_hnS-27PQ73S-9PJFOE3Q/ef2ssVDg5wWlxv920M2XckjZhsS31PX6dnDOfDii6mU",
+            "width": 54,
+            "height": 36
+          },
+          "large": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/u_XYopRd04Ai2REeObXP1A/x0i_KxMTZV0bnMF1mAuFMtQNDkreLRGAVk6CYcuFtCzhDexxmH2cSGJHYYL06dXFYUs7nhcPwIBgfDmvNZSJCFJopseHBO7S9x9qYN9nMqd3jOFmYEzLpKFeqh7ECbe9fhjnZejinAmcoY1mknOigA/xgosWeQzqZPyK0A2X7TQCAy3cyNb6g-HCWepfjjKi-0",
+            "width": 600,
+            "height": 401
+          },
+          "full": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/XrKcc4N79P4Bpw7dahmYSw/xGt8JODesrz2jglUHuW4A_nC8uDCgcNQymFSN-bVd0IpG4CohtehDJg_A2cJ4vBIpYKn8Ht-lDAEw7opv0sm6DWykUNtlyqsY1fANmucGKb9nA5ihKuBbKaFWn0l5DoMrDNMTPvYAEuRjPUq12hHOg/-2sO3ZW1BWiQgZ1uoYTJUbhtLSjQykiJtAjOLdEUbac",
+            "width": 600,
+            "height": 401
+          }
+        }
+      }
+    ],
+    "Status": "Scheduled",
+    "Created From Lead": [
+      "recsaXFOEEdRt3e23"
+    ],
+    "Notes": "Client prefers chocolate cake. Confirmed magician for kids' entertainment.",
+    "Client Email": [
+      "jessica.lee@email3a44.com"
+    ],
+    "Client Phone": [
+      "+1 555-234-5678"
+    ],
+    "Lead Name": [
+      "Jessica Turner"
+    ],
+    "Event Duration (hrs)": {
+      "specialValue": "NaN"
+    },
+    "Event Summary (AI)": {
+      "state": "generated",
+      "value": "A 45-guest birthday celebration with special menu and entertainment needs.",
+      "isStale": true
+    },
+    "Requirements Action Items (AI)": {
+      "state": "generated",
+      "value": "Order chocolate cake, confirm projector setup, reserve kids play area, coordinate with magician",
+      "isStale": true
+    },
+    "Activities": "Sarah Lee"
+  },
+  {
+    "id": "recqDiApLCA9Fl2zu",
+    "Event Name": "Acme Corp Q3 Meeting",
+    "Client": [
+      "recWrbx6J2oSlDrR9"
+    ],
+    "Event Date": "2025-10-05",
+    "Start Time": "09:00",
+    "End Time": "13:00",
+    "Event Type": "Corporate",
+    "Number of Guests": 30,
+    "Requirements": "Conference seating, AV setup, coffee/tea service, gluten-free options",
+    "Event Photos": [
+      {
+        "id": "attngVn4JlK0xNH48",
+        "width": 600,
+        "height": 401,
+        "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/wLbLwGKS_JwZa_tiaPF0hw/Dmt_7XJzlhwVJvNY6abHtS8ICxmcI2O0YCr2EWWBENcJzQqIdYmaO0jITCG36n3fLQ33aTzJgggPAIc1oBnF4UdSzfZh7ST8KTsSi2Nfhxr_1cISwbVi7a9JI_cWJYoDpYm53wuFQVZqr1ttfnUfwqktVvMXcovi6ZetOumfdZ8/1F7RfcdFPNjvqMa9OQw9tlDVWlDGekS5_7BT9pTHJ-c",
+        "filename": "abstract_15.png",
+        "size": 123059,
+        "type": "image/png",
+        "thumbnails": {
+          "small": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/IIKUD84oDbCgXWeNLwcG9A/OyAAg5SLsMNPkQjEJj1q3EkRvvNIKQaQOM6W76A-kK5CEFB6QzGHUtmx_W4AFm1GwYwtyYCVS9ooFkconxhVKHQj3re0JbD2qh-qGtVIE3HTW1Zk0Tn7VmJKxNzC146rlDMu1CmnHwIsHnsz6ewk5Q/F00m3WR-_yleAtMmFQ5iCskS5XxJ3GXyT6MIzQPV8d8",
+            "width": 54,
+            "height": 36
+          },
+          "large": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/hQbOvUdROGIkM3Dc8EGX8w/0eMcxEiaqB2nnNCO1nL_3-Z--oz4ySTqtH_F9cutt67VfD4cl6uCeMeZ4LLpVTSLyx6EqWOgNeukYlXF76h0RQP8kGuWH5XtrklA5S6Z3--k1PHk8uPXDh09NxuKYsPMdl93VX-uYYsKtr616uzHoQ/Q_isTMyNbeBD9eSoKRJcTsC6OdG8qVHrbeYyKpXcVRU",
+            "width": 600,
+            "height": 401
+          },
+          "full": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/Bjg5sjxngpc9bK1GqlNceA/O5n61-n1d067jC24Hwc2SExvRomwgPfz-OAxuOX0iDIMYvOLZSNSQnPSXA2wrvanQqjW0HKJUU5on5jFJiuWfh40Wz_rqzTl7U4YHABAS55JU13Px51jU1_FmIsabNz8uH1BLMzfqhG_wkccZMDEPA/1Z66HMVsTyeJQcpr9zUglhHstmgaIqRtJvJiEupmiWE",
+            "width": 600,
+            "height": 401
+          }
+        }
+      }
+    ],
+    "Status": "Scheduled",
+    "Notes": "Client requests early setup. Ensure Wi-Fi details are shared.",
+    "Client Email": [
+      "david.martinez@martinezlawfad4.com"
+    ],
+    "Client Phone": [
+      "+1 555-876-5432"
+    ],
+    "Event Duration (hrs)": {
+      "specialValue": "NaN"
+    },
+    "Event Summary (AI)": {
+      "state": "generated",
+      "value": "Corporate Q3 meeting for 30 guests with AV and catering requirements.",
+      "isStale": true
+    },
+    "Requirements Action Items (AI)": {
+      "state": "generated",
+      "value": "Arrange conference seating, test AV equipment, prepare gluten-free snacks, print Wi-Fi info",
+      "isStale": true
+    },
+    "Activities": "Miguel Torres"
+  },
+  {
+    "id": "rec9rlOmh89B3OPrj",
+    "Event Name": "Martinez Wedding Reception",
+    "Client": [
+      "rectB1SEekiNtQPG9"
+    ],
+    "Event Date": "2025-11-15",
+    "Start Time": "17:00",
+    "End Time": "23:00",
+    "Event Type": "Wedding",
+    "Number of Guests": 80,
+    "Requirements": "Buffet dinner, dance floor, floral decorations, live band, photo booth",
+    "Event Photos": [
+      {
+        "id": "attQqCCeJtg3qY2JR",
+        "width": 600,
+        "height": 401,
+        "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/L8aGxQwl4FxBk9JNOQth1Q/CTGiVVPU6Zgxky1Ii_Zsu8deUYhGY8DpnuOYXYjkVixhyvrY0QW_ehl0ycLRczdeoFJpf4FX6_8BjHmWwC98ETeByQN2jAgeBhbyjiyLTko7zwhZZlkPuRkbFyBLcyg3y-_9STepoU1lB-k5KYj3lzQd2ELeAc3iZ8V2VxswAHo/bajjB635R9laCUfVNo31LILXisVNm7b_cmNiShDfkts",
+        "filename": "abstract_34.png",
+        "size": 101619,
+        "type": "image/png",
+        "thumbnails": {
+          "small": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/P2J-u2WKPdvv28kt-zUvOQ/j0zNXbubR8F757TarUt4xreqzb4KRCfyWEEYyUgCeZITjPD4Rqtr1z4lSGhoAfa3Bmj1QGvVZNAGZsbAMZwp1VWtjxOHP_6Mr2cuFiShCr34dE1A34-vPfjF5Hhbp89N5uueDLy19QoegTvMbfeTZw/1OXz8G6y0v1jgIyKxoxkSb0Iooa0CLnzKpks1iNw_NA",
+            "width": 54,
+            "height": 36
+          },
+          "large": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/HWsrwrnWMUGkBuo4T_mbvw/RMrnGiOqUPDVbgNkmJwJSJRrWF1ZExxLJdHAG-ncUG5J6PEiHYEPA7k-ORLGtA-LXrWSO_r-9TXSMYD5IzhV781Vs5Eagkhe0wt2l6gF3zSoT4ZLO5Qc03gTwgu5aU7ZoZyZRMH9n2XPS9YwXRel2Q/Opg7SwF0dwZIP910swRB6etKHUVrjfuAYwBAjyH9m-8",
+            "width": 600,
+            "height": 401
+          },
+          "full": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/uU8PxK7tIWZeEqh_p-hGaw/AGAmfn_1erb2tebup5GpqfM13T0ZHqXyI79CzKQiiO6jPMxb7h6PDbSfMAozvxSmPR2eHFmmsXwvO7oM6PEKnijZWzIWrZ4hVbBGPu3dIjtVRKt9pazfG9RMyduVyR_MxDzk7avA0xVTwtFmtlI8Cw/5AI33iGUCPTbXQ8tP5_Rog1L62tik0ymNVSRTZT50sI",
+            "width": 600,
+            "height": 401
+          }
+        }
+      }
+    ],
+    "Status": "Scheduled",
+    "Notes": "Band to arrive by 15:30. Confirm floral delivery schedule.",
+    "Client Email": [
+      "priya.sharma@email1375.com"
+    ],
+    "Client Phone": [
+      "+1 555-321-9876"
+    ],
+    "Event Duration (hrs)": {
+      "specialValue": "NaN"
+    },
+    "Event Summary (AI)": {
+      "state": "generated",
+      "value": "Wedding reception for 80 guests with entertainment and decor needs.",
+      "isStale": true
+    },
+    "Requirements Action Items (AI)": {
+      "state": "generated",
+      "value": "Book photo booth, confirm floral arrangements, schedule band arrival, setup dance floor",
+      "isStale": true
+    },
+    "Activities": "Priya Patel"
+  },
+  {
+    "id": "reccu9mGVw4GTlhta",
+    "Event Name": "Chen Private Party",
+    "Client": [
+      "rec6A2RFAwzpCceJb"
+    ],
+    "Event Date": "2025-09-28",
+    "Start Time": "19:00",
+    "End Time": "23:00",
+    "Event Type": "Private Party",
+    "Number of Guests": 25,
+    "Requirements": "Cocktail bar, tapas menu, outdoor seating, heaters if chilly",
+    "Event Photos": [
+      {
+        "id": "attt4goW2nnmiVly4",
+        "width": 600,
+        "height": 401,
+        "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/FvkZ-q4xolBa9yZETsemBA/sTfTdCShYNbRfueKrUQmM_FecuX18020Y5zhC3no1CSC6AVoiToUXCIoz81r9UcpKgQVwTlq70dgqJboZ2ptjHihNLAZQSLnTRONZgn5WO7K4y6q56R-jfxIz7JfA4U3gZZM8NBk6RoYQYje2cKbWbYMfkqtbYMder3yhXu82vI/UYVH_CBcSxBILqSHm9qDmZisu3FoMV0SUBBiw58kNhQ",
+        "filename": "abstract_39.png",
+        "size": 127071,
+        "type": "image/png",
+        "thumbnails": {
+          "small": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/9wjs4cl3N25KWekWJQ6ChA/oChbeMtRf22mSnzboWR2OtYPJQcVh3kHaOyTpxsitJyQRT9yR7bLPVZZJaS-fbo_wV533Lc5mq1sC8C9_eDy_dI8JjzA0QnCPsxkV00cGZjYsEfMFRQNecAT9hFUZVc6NZoNysVYCgs4arcg4SW5MA/ZgphNOn16jzm-ceKHaE1Kqt3ECgwCoEaFR8oLh0wQrU",
+            "width": 54,
+            "height": 36
+          },
+          "large": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/2o01ClONdbt2GOYYuVFvKg/4vbknAcARDPSw1o1Aj4TK-0lSEThi3RzWx3gO9iV-upsZPFYVKQOIEfb0XtQAdc2GL0434KBMbJMQNtVzA_zgqbZRgDINWlaUOtS5c8GGZWECF4qDu7dqV4r0JD7MU12L1_KTPNdtUy84t_K9cipFg/l4DY4mvb1c9846eCxicONx5gSMILH596XhRrcq5IYgU",
+            "width": 600,
+            "height": 401
+          },
+          "full": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/MHST4aYi0IsPoiZdwV4W2Q/FD0pQKj5EzxZDYx_KbhngF9GSk0Gs58ysTTs_Gvo7PXXdV-xVX-KozckAGMRDbfRvIeKgAjAKvlFVBs7YquIho9to-Nc47dzzVQW6sOGXSysnQj9rf_Kz3vS6431vovt5syUId_4ofxlxkuiiWFLPw/KzxWaAstB0UINuUjlhVi4g0MvkKtCAfRmqye6QOebSI",
+            "width": 600,
+            "height": 401
+          }
+        }
+      }
+    ],
+    "Status": "Scheduled",
+    "Notes": "Outdoor area requested. Monitor weather for heater needs.",
+    "Client Email": [
+      "michael.chen@techstart94ff.com"
+    ],
+    "Client Phone": [
+      "+1 555-654-3210"
+    ],
+    "Event Duration (hrs)": {
+      "specialValue": "NaN"
+    },
+    "Event Summary (AI)": {
+      "state": "generated",
+      "value": "Private party for 25 with outdoor seating and custom menu.",
+      "isStale": true
+    },
+    "Requirements Action Items (AI)": {
+      "state": "generated",
+      "value": "Reserve outdoor area, arrange cocktail bar, prepare heaters, finalize tapas menu",
+      "isStale": true
+    },
+    "Activities": "Alex Kim"
+  },
+  {
+    "id": "recIaz4epVUjrsQtk",
+    "Event Name": "Smith Anniversary Dinner",
+    "Client": [
+      "rec0gCAGiaNKOlL8L"
+    ],
+    "Event Date": "2025-09-18",
+    "Start Time": "18:30",
+    "End Time": "21:30",
+    "Event Type": "Other",
+    "Number of Guests": 12,
+    "Requirements": "Intimate table setup, personalized menu cards, background jazz music",
+    "Event Photos": [
+      {
+        "id": "attM6KM4LJanpJRBl",
+        "width": 600,
+        "height": 401,
+        "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/NGcEccNiK58OYmc5pX585Q/pjKCtcczLCie7DQHrEqrXEXQ9fVCfk9i6b0xSra6PfuHSYLU5y3R38fslEDCd4y8j8K94W3faDJnE2JpsMqT9BUpcZvqI9ejQ-pBhBVZY6ZbHlaxwXmKgzpi_mjCQwyZjVl4OinkO0sEkqQIwq1NWQqi6PW6CQdsWLA7fhrKLUQ/QdMnR6aJjDxgaPxmJHZqELXoKwPR_ZYfHEqY0kI70EQ",
+        "filename": "abstract_35.png",
+        "size": 302330,
+        "type": "image/png",
+        "thumbnails": {
+          "small": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/nEyyHbwDx-IpztQeLYhrpw/YVa7Ase5BLCqiSvWkeljdeEwKiN-lMxoii8nypyuDcXnnHbAckqkPbO-7ywPJKlksnTX-ctQ2YJz0JycelNwcH3r9rU5r18ez8NwcggDeMvWlGRm9DOuyfp6ImIjcNT2RB4h8dw5zPiyGKuAOk72dQ/nFfMNHq735Q8FvzQsDxFt9QVPuHzYT7yoR9Dl4sGMuM",
+            "width": 54,
+            "height": 36
+          },
+          "large": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/2XrFr-WQIw5a12G0K_RuVw/mkN1PC3eSGYFBja6rTBx6CSeb8DlwcRNvDMWzhhSZ1YTxmAKrwdDUVYwUBl8dJfGXjfYYhSmm4Bev8Kt4Naoe0TShW4fF--bsJvhHKWFGB1YthRiq2eGZirgyaMxpFseM4yXqQyxbDaXo4lp0d2SaA/jhbvVOOE2JyyKR_ctB72VaH4SvFM055-eenmRdfGRkU",
+            "width": 600,
+            "height": 401
+          },
+          "full": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/vnv1WY1dW5Sf3tFZVQGKMw/nBD07Epj0jYVpCjWKG2TVlnUW7UiV5NcRY1g50bOvQ3Atof92m10Q3cbCfSs_d4EHnHevJxYVemOKG7Hok91jnkV295QcR3mA3EZp6NyzkmvMft6loabERnpM0Mg-v_LLINN1inZNOOA5yVaH1MroQ/ARS5pHGhrdSqbTNm6x_ZF2qNlVYledRhAM_-c_BKWqs",
+            "width": 600,
+            "height": 401
+          }
+        }
+      }
+    ],
+    "Status": "Scheduled",
+    "Created From Lead": [
+      "recSQns4wwKeCBjtC"
+    ],
+    "Notes": "Client wants a quiet corner. Confirm jazz playlist.",
+    "Client Email": [
+      "sophia.turner@email7d1e.com"
+    ],
+    "Client Phone": [
+      "+1 555-789-1234"
+    ],
+    "Lead Name": [
+      "Priya Singh"
+    ],
+    "Event Duration (hrs)": {
+      "specialValue": "NaN"
+    },
+    "Event Summary (AI)": {
+      "state": "generated",
+      "value": "Anniversary dinner for 12 with personalized touches and music.",
+      "isStale": true
+    },
+    "Requirements Action Items (AI)": {
+      "state": "generated",
+      "value": "Set up intimate table, print menu cards, curate jazz playlist, reserve quiet section",
+      "isStale": true
+    },
+    "Activities": "Jamie Chen"
+  }
+]

@@ -1,2 +1,266 @@
-[]
-
+[
+  {
+    "id": "recVCNGEQktZvEA1G",
+    "שם חבילה (Package Name)": "קלאסית",
+    "תיאור (Description)": "חבילה שמקבלים קצת מהכל ",
+    "מחיר (Price)": 250,
+    "פעיל (Active)": true,
+    "מנות בחבילה (Menu Items in Package)": [
+      "recoAdMbbjIUY0i0N",
+      "recz7e4bWVuoiDZfK",
+      "recMRW9CXX8bvx1wr",
+      "rec4ZxC52xFCL831W",
+      "recpzy6gIkhSKawS5",
+      "recVODT3InzKyG1ME",
+      "recImfxVsz70nKnil",
+      "recq4eUbGMYW48KNh",
+      "recnD0PPByNxygXRg",
+      "recVYpD0sgyIFUl6I",
+      "rectRRwLCvBYpJEf6",
+      "recXsUjIubNdxOFK6",
+      "recKsfK7wXEUnvAHC"
+    ],
+    "תמונה (Image)": [
+      {
+        "id": "att3nEp2FljwLciON",
+        "width": 2752,
+        "height": 1536,
+        "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/bdNVuNUVxMC5CyucGOuvyg/9z_rR4B3uq244dKxSkdkcDSwQyAp6N1xWeo2JmZoWx7K2o2T3xIWVoYketUymC28wwMlsKXvgraRZgeSo6nMQjeYKBOAFpCcd3XUoXfsIYF1PwLkolowlXh-MvZTN1Q_uNIKSolYD1fK08cCj55X_FT0143HL35ZRbsamx82BT_88jFM66Rt8Vgn-dqVBZ4gz9Ce0k8GNp_xqQ-HdPrlWHe0Ati5OVHfscI3U4UMhbw/McM0ewnDOfkYggEs0AuX2fazJjdJXt4WOVxRu9TGN1Y",
+        "filename": "Lucid_Realism_A_delicate_serving_of_tagliatelle_pasta_is_place_0.jpg",
+        "size": 2241997,
+        "type": "image/jpeg",
+        "thumbnails": {
+          "small": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/dAmuqWfbxL4sqUyNOwYEOw/pfrmARvflALuGKaUxzPBJsgoAkdRSYS0Tf1c2jz_jZhHviZejmAes2fyX1H4c5fYDBfmCKVdwVW4ufSyTq5cjHDKR-KJfo03k09NpmirOfsZpqZU8PMSpxLAs9VmXG2rkD3NmLDflUqhyv47anX3VA/LLEkjkA75CTgcNCuTjl8HwetLUhCbAHExnohgWoaXuI",
+            "width": 65,
+            "height": 36
+          },
+          "large": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/a_FBB-5SMn-qoag2YceIRQ/Rj5FT_necPU0ybMEfyWvmTIxcvSyM4PU_xHaNy33wM4ReVnbJ6AH9662KXRQlVc5zV9Tt5Ae1_WsOTJg0-7eph1jQoOmD0r9OUJ5V_ECZEiGMtajCcTTV8lDAbRhCwMRoOIty4M4yjQBGfaGrAfugw/rLRHNSVuMvWfrP8rIJLNriAWlCS9Zx7l8u5GrGQEiMk",
+            "width": 917,
+            "height": 512
+          },
+          "full": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/jwe5MzvTp73zW4mPlI_4Gw/Jt1yxxn0zxj_nGNUNTzsA8By1GnZkCW8NrgKqJE78nIVrACX_fR7CDpt4IMbAbnwORfpGSuqjse_JDNhL8Xtln2zMMmbZwU67pVe-7Pji9Nk_IXKshOJoPWrQPgFtzlZKhiX79hf3quqfRyi7ydFzw/a9S9BjxFt41XWwqzogPG7jz3FsnAAUjEvX4j2isAUXk",
+            "width": 2752,
+            "height": 1536
+          }
+        }
+      }
+    ],
+    "Benefits": [
+      "benefit1",
+      "Benefit3"
+    ],
+    "Last Modified": "2025-10-23T13:37:21.000Z"
+  },
+  {
+    "id": "recIyfXsbEgX0qpNX",
+    "שם חבילה (Package Name)": "אקסולוסיבית",
+    "תיאור (Description)": "חבילה שאנחנו באנו להתפנק ולפנק",
+    "מחיר (Price)": 290,
+    "פעיל (Active)": true,
+    "מנות בחבילה (Menu Items in Package)": [
+      "recoAdMbbjIUY0i0N",
+      "rec4ZxC52xFCL831W",
+      "recMRW9CXX8bvx1wr",
+      "recVODT3InzKyG1ME",
+      "recq4eUbGMYW48KNh",
+      "recnD0PPByNxygXRg",
+      "recVYpD0sgyIFUl6I",
+      "recoWsE1cwbnLTd8X",
+      "rec25SSgCGCSj7pBD",
+      "rec9c5JiGeDa6ZvzQ",
+      "recfCjOL1GJDsjA2j",
+      "rectRRwLCvBYpJEf6",
+      "recXsUjIubNdxOFK6",
+      "recKsfK7wXEUnvAHC"
+    ],
+    "תמונה (Image)": [
+      {
+        "id": "attjJ8FL6YS7JhRxf",
+        "width": 1376,
+        "height": 768,
+        "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/2nPCM34zuJ5TWpYK6yIvhg/kPa8ZrITnOgG7zuGUxcs4S0EHkA68UuloODOsb9ZuVVJixS127Cpx1yN69qxr391AnONtIwtb3WK8x3870NMe-W0YHDXbfuxP4Z6Crl1xQ7LncAoJadbc2HonUuKROefD8DKPChBMp-TgP97wyMsXVOnVOqiD6w1C7bk4njwkbut4W_LFkje4pw5NRqxul8J3L6_FZkr3ePhsPkQRCSyZoGJO8g8UFe2I5LFqVJZ3VM/3fDZ8sonqpWV1hTBqPzC7JT4vzpHVKrbnVsGlXRPThU",
+        "filename": "Lucid_Realism_Image_of_meticulously_arranged_dishes_in_an_upsc_3.jpg",
+        "size": 559223,
+        "type": "image/jpeg",
+        "thumbnails": {
+          "small": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/VJur9_qy0vxupE_gYtgYSw/57fDyc4d_GFO6rqXRNRvb3TwmGzUtj5vfNp3zGEBbNsZoGhEp7Hu6wgcBTjxAywsYygnK3TGTEo0ILN7uRjzrNSsaDW3D5_qevLecwQ1bAFVQZndGXnWsElhQvdcplrznLIKLjrWQLazsIflbFlKXA/9IV6MrIft0FfmRSlegjAC9Orq-kAEdxVMchw388sCkY",
+            "width": 65,
+            "height": 36
+          },
+          "large": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/a1ev7i5axikMU_PE5HL9tg/PfNr-L1OuhhhbRVkBVdavV_6dPfD1A-xXPdTXhrdPMR1kM_0m5-JhnrKtDtyYc2rzzMLQlgEc6OtTEqKb8hi00hfHW2OfZvg_hyxh2WxbYgMxtMpyJG-gPdy-U_k7LsgiBzLxgBM35EEmgX2otmixA/hYr1nselrus6Mt9iastzi6yFYD6zXEo6MCMweuQqDtk",
+            "width": 917,
+            "height": 512
+          },
+          "full": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/hoATnLKpaH_m2rz_IeeukA/WdrqFzTDmgWCUpLOV8LWiwJ2S87JEjuwK3JImJRJMOmE2Ha89uASVTN4e7MenNcKyXdQ8yG8afHOkg8LkzvONhg_A8E-7xqfkuLk_QE5gCF3w4wZgsdw6Zpx513MgbcizDWWmxsuf1NmVt3BOfKHFw/LEaQah8li4yFFb1OjbGYWmLh43Uk5r27gWfzRY_0Kbw",
+            "width": 1376,
+            "height": 768
+          }
+        }
+      }
+    ],
+    "Benefits": [
+      "Benefit5",
+      "Benefit6"
+    ],
+    "Last Modified": "2025-10-23T13:37:24.000Z"
+  },
+  {
+    "id": "recTCM9c62jwChkVi",
+    "שם חבילה (Package Name)": "פרימיום",
+    "תיאור (Description)": "חגיגה זאת חגיגה",
+    "מחיר (Price)": 350,
+    "פעיל (Active)": true,
+    "מנות בחבילה (Menu Items in Package)": [
+      "recoAdMbbjIUY0i0N",
+      "recz7e4bWVuoiDZfK",
+      "rec4ZxC52xFCL831W",
+      "recMRW9CXX8bvx1wr",
+      "recVODT3InzKyG1ME",
+      "recq4eUbGMYW48KNh",
+      "recnD0PPByNxygXRg",
+      "recVYpD0sgyIFUl6I",
+      "recoWsE1cwbnLTd8X",
+      "rec25SSgCGCSj7pBD",
+      "rec9c5JiGeDa6ZvzQ",
+      "rec3cAAabG7an34ns",
+      "recpirpSwkPGEJbPl",
+      "recfCjOL1GJDsjA2j",
+      "reciTUFTG0vY6dbZR",
+      "rec6BwVfIcMpIqF6S",
+      "rectRRwLCvBYpJEf6",
+      "recXsUjIubNdxOFK6",
+      "recKsfK7wXEUnvAHC"
+    ],
+    "תמונה (Image)": [
+      {
+        "id": "attUnoRupsn4WFjMU",
+        "width": 1376,
+        "height": 768,
+        "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/930TeTGjOgMkrfyHqPlFPA/ahX2jj84rBA5aPeTwNxXFxRe4GpZ-OdMQoPqRYyd0KEJn6ottVSuYH0Vr17APfP6crErEu2CBR15671uaDnkh6-FBvRyJXpG7eBY8DzlUlw-cIpW7tdWPPXH4GwTHzUf2GWi9-L1_35bP4e5jJJTaAXTBHplDX18NqwAME9UpwRFhFK-oyGZ-5clt_O0DAWVfViKCujjZ0k2KVIOQq9wuhPcM8n0QtVUdfqyMRWuZ4A/2UMPKM0gvcRMmRObemy1b0cgmLmX8gzCxILkdOxjEp4",
+        "filename": "Lucid_Realism_A_sophisticated_sommelier_with_a_warm_smile_and__1.jpg",
+        "size": 502339,
+        "type": "image/jpeg",
+        "thumbnails": {
+          "small": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/odgW_5iYdRgkLOhSW-V7Cw/HLxuA4oKxo8Iv1nX7tKJsve-rOSUpGGeAAcZUY12mmkmVXOAw9HqQNmpnVh5xuTDjDe1q3LmSPZEURBbZMrM04BcDtQ8GVmutYbI2qgGF2MhW21MO_jNAt47n8o8EKFhA0tAbWMWsKJ14e03nKpU-Q/YqWaXtYGS-HE24LSMZDWb047lsWR6vgrCaeDw0TfVcM",
+            "width": 65,
+            "height": 36
+          },
+          "large": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/ri7bmFmu6qA39SOAVCIPZw/7j6K6GnyibAu9B6V8W2NJw6g_YDxEAXR6z-yYG2R3LKUbKJJw4mv34tL2dN9ixsCM1ONV22WJ9xizoeDq8QzTyDZLs5eVsM5DDXT5WZZEhvD_XM9NwQIOimE_5jke0_9dvymBwmP_AF0odT2rJoUCg/Up3EpUMOZPaf57SYc_SJpWghYaH5dWfcaDWzphzKkSQ",
+            "width": 917,
+            "height": 512
+          },
+          "full": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/8PTBS0f90M6dmnSmJLgnSg/T9_FTWgLUJHPo7eNDVeSb5ISSo1GQMxWn4HygYtKGxHXjke5sny3zoYzhnhRWaEuktz3iimJoAu7Qs-lG7TMwDR9b3fsT55dI8_SftibunqtwH7jV3sti4EAT4d4DnoLttsHKloflmxU8S1wuqgkSA/DmA-FUfIxtf5rW2HiS2Or-OBMpbjJK-C-qb5tbqDvD8",
+            "width": 1376,
+            "height": 768
+          }
+        }
+      }
+    ],
+    "Benefits": [
+      "Benefit2",
+      "Benefit5"
+    ],
+    "Last Modified": "2025-10-23T13:37:27.000Z"
+  },
+  {
+    "id": "rec6OE3beCOCpW7XV",
+    "שם חבילה (Package Name)": "Brunch with friends",
+    "תיאור (Description)": "חבילת בראנץ' עם תוספות אקסטרה",
+    "מחיר (Price)": 150,
+    "פעיל (Active)": true,
+    "מנות בחבילה (Menu Items in Package)": [
+      "recMRW9CXX8bvx1wr",
+      "rec4ZxC52xFCL831W",
+      "recpzy6gIkhSKawS5",
+      "recVODT3InzKyG1ME",
+      "rectRRwLCvBYpJEf6",
+      "recXsUjIubNdxOFK6",
+      "recKsfK7wXEUnvAHC"
+    ],
+    "תמונה (Image)": [
+      {
+        "id": "attCOTJkY4FiacRYH",
+        "width": 1376,
+        "height": 768,
+        "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/orfin2aXdTHyFWKTSmEgqw/eAnJ95WA8R8j6cVTHUgYnGH_Th36yqaKQJUnkgMTiv0GvG4FSpo-b07tZnFDn9ZyE696m5uVSoP0LQL-kMRjn1oDI7DDWaWxwFki3XK0iWCjbe-auqQ2rciIJ-7vL5GZdwoYG32q77MeCkGV-Rt7rylV-ORSERI_ERllJYARLfanh-lF3SFmHJKuOodfEWeIo8VVjlM_OB66NhwO_eyj0eHN_O2HFtlieiW5mstzAqU/Ho5vuIxiz-NLq10j0oSl0FFNh0wc0MhgyDQO-qdYuMg",
+        "filename": "Lucid_Realism_A_warm_and_inviting_scene_of_brunch_in_a_traditi_1.jpg",
+        "size": 669365,
+        "type": "image/jpeg",
+        "thumbnails": {
+          "small": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/2cbcllJ_oeAkskgBenKHxA/OgAESbSXP-07xVnSVFC6w2RlamNqrf98ErA2h0pvzyiRgtB5DZ1qOwJ59UlFv1B3nD190i_1RVvBg6GwgVsonew33N96dMpNyHzLdahPoisntSM5-mSep_Nui_4k_4-F6GMLPG2YVHIL_-f-NQJ0NA/FAE9HlfqWFsQz36Gve-hTWYUocKv4ONQGoskMAZlNtk",
+            "width": 65,
+            "height": 36
+          },
+          "large": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/gdJv2iHYdZI5R9HhrZfL3w/pXdKivgM6z16gZOYW1qoNSqKGp3qgnGbRtEvh3eYT4-AbBeMMB1rvbjROAzNUJKGRaOd5ospMFVd-emVwglHxRfMXHNtNDbHdFePpGxbKgHYuqskpEjfBN6nbQ1HLiqZN6zZ0ScBNZt4hOzrUD1QVw/mig8uLcWaJtLp2nJoA1ImY7tqoB7MGXme-Opvz5j7RE",
+            "width": 917,
+            "height": 512
+          },
+          "full": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/YIW11BTUGojuvyFe-lFaWw/4pGGltvPQlQEenPe7Sn9tf27o39QkgcdB3EltFEHbuHR1dy8pdsbnjyBwDC8MLpPXXazFW4rroiKhczqb3TR4jSXtac4O65vpsDe0_6FrHE90lw8sLuKoh8fK2Ajv-T20b7cWkIZFmg6jj_T-bcxKg/TYK2WRsCn7eAYefZrCm6E6r9IGPS0x7CgiVuFssm0yc",
+            "width": 1376,
+            "height": 768
+          }
+        }
+      }
+    ],
+    "Benefits": [
+      "benefit1",
+      "Benefit3",
+      "Benefit5",
+      "Benefit6"
+    ],
+    "Last Modified": "2025-10-23T13:37:30.000Z"
+  },
+  {
+    "id": "reck7WsAScic6f3cv",
+    "פעיל (Active)": true,
+    "מנות בחבילה (Menu Items in Package)": [
+      "recoAdMbbjIUY0i0N"
+    ],
+    "תמונה (Image)": [
+      {
+        "id": "attjlWHJQFgLGMtfE",
+        "width": 2048,
+        "height": 2048,
+        "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/gzfU-LmlYCK0bzC0GbnlDw/-5Q7heKr1dmKfneEGaBwCFa0uvcVb-IvUpyuJdPA8LMDduFOo8b62TX6n-WDEM0w0k1vBniMxNi9V1sDU2-2rfr5aGnBT21JOY5vEFHKJ9gAvlgYHOu0cZOtapO2j2v8x2l_C_tCZF4CCWrhFNxyjFDNyLTOkm1JonUUBumuK5zwMT6VJEI9qWf5JRG0SBwNMQ-oX1lj4clFB4_haGQxCQ/AZ-ElElfSNd4sHW4b8HJUPujX91XZmW-W9Rb5eXcP-Y",
+        "filename": "atmospheric_photography_of_a_dimly_lit_res_2.jpg",
+        "size": 1753440,
+        "type": "image/jpeg",
+        "thumbnails": {
+          "small": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/Mn_Fyl6B24rAT0tpIajheg/NWTHiDWGrNmu6CIzN5FyCKeudMV8w3Z2s9VIh10_W4BjTCUmaviOf9B2wZ85l2fjuF6l2aWxSHLvpJa3A005VnLT89uM4IqPGu8UaApExkIRzx2oGq4NP3JKVElGTiCHTcCDzWUOeuFET6mkRRXInQ/KFw-0ETe5Ox4g5FLrpXZwjtaot-4yksyol2CXByyff8",
+            "width": 36,
+            "height": 36
+          },
+          "large": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/IkK3TQXc4EfAj2_AxOg1Rg/UZ5PStJwWvRWkl3wugHLCzkGw9Wjx-ZWuRZw_-joLSb92foaqRptz0dbloLiTExGsP7ZWPzwH2Pg72nNBN_BKeQRmlGAYYw9QUb-5K5Zqq1KBDQtrBvc6vvXO47-_koh1kTMKE0oRvhjJQQnPBZP1g/cMGhiVayAmGITGmSFzl3kJOYNLcbLYtrUuPdBfbpJ1E",
+            "width": 512,
+            "height": 512
+          },
+          "full": {
+            "url": "https://v5.airtableusercontent.com/v3/u/46/46/1762171200000/I4cNcfzL90mBCi_mF7f-ug/BGPkspZplY0Pk4svKjA79GjM9ZtZriRzBTsEwW5eA3hrbHwLeTyMO_9UOaYaGQEyu1L3KNclty8OPPHP_TiBJpTFKt3mMz-7o37Agms_d5e0WSDUmHJBt7f4PHzPJdnBWIO3469-CcKG1D58iU6dcQ/mIf5RzW46zCkhLlu4utI6olyuA0oMrTnPd4EgBDfq4Y",
+            "width": 2048,
+            "height": 2048
+          }
+        }
+      }
+    ],
+    "Benefits": [
+      "Benefit2",
+      "Benefit4",
+      "Benefit6"
+    ],
+    "Last Modified": "2025-10-23T13:09:43.000Z"
+  }
+]

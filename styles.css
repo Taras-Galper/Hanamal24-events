@@ -148,7 +148,8 @@ main {
   width: 100%;
   height: 100%;
   opacity: 0;
-  transition: opacity 1s ease-in-out;
+  visibility: hidden;
+  transition: opacity 1s ease-in-out, visibility 1s ease-in-out;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -156,6 +157,7 @@ main {
 
 .hero-slide.active {
   opacity: 1;
+  visibility: visible;
 }
 
 .hero-background {
@@ -1948,7 +1950,7 @@ footer p {
   /* Better carousel on mobile */
   .hero-carousel {
     touch-action: manipulation; /* Allow scrolling but prevent zoom */
-    overflow: visible;
+    overflow: hidden;
     min-height: 50vh;
     position: relative;
     /* Ensure proper mobile viewport handling */
@@ -1962,15 +1964,25 @@ footer p {
     position: relative;
     /* Prevent overflow issues */
     overflow: hidden;
+    width: 100%;
   }
   
-  /* Ensure hero slide content is properly positioned */
+  /* Ensure hero slide content is properly positioned - keep absolute positioning */
   .hero-slide {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
     height: 100%;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
+    /* Ensure inactive slides don't overflow */
+    z-index: 1;
+  }
+  
+  .hero-slide.active {
+    z-index: 2;
   }
   
   /* Fix scrolling interference */

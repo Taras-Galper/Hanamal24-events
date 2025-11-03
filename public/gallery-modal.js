@@ -257,7 +257,7 @@ class GalleryModalHandler {
       return `
         <div class="gallery-item" onclick="openGalleryModal('${imageUrl}', '${title.replace(/'/g, "\\'")}', '${description.replace(/'/g, "\\'")}', ${globalIndex})">
           <div class="gallery-image-container">
-            <img src="${imageUrl}" alt="${title}" class="gallery-image" loading="lazy" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.add('show');">
+            <img src="${imageUrl}" alt="${title}" class="gallery-image" loading="eager" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.add('show');">
             <div class="image-placeholder">📷</div>
           </div>
           <div class="gallery-content">
