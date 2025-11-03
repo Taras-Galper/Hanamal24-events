@@ -254,9 +254,20 @@ async function build() {
     console.log("📋 Package fields:", Object.keys(packages[0]).join(", "));
   }
   
-  // Images are no longer processed from Airtable
+  // Process images with Cloudinary if configured
   let cloudinaryImageMap = new Map();
   let imageMap = new Map();
+  
+  // Try to sync images to Cloudinary if credentials are available
+  try {
+    const { syncImagesToCloudinary } = await import('./cloudinary-sync.js');
+    const data = { events, menus, packages, dishes, gallery, hero, about };
+    const cloudinaryResult = await syncImagesToCloudinary(data);
+    cloudinaryImageMap = cloudinaryResult.imageMap || new Map();
+    console.log(`☁️ Cloudinary sync: ${cloudinaryResult.uploaded || 0} uploaded, ${cloudinaryResult.skipped || 0} existing`);
+  } catch (error) {
+    console.log('📸 Cloudinary sync skipped:', error.message);
+  }
   
   // Add fallback content if no Airtable data
   const fallbackHero = [{

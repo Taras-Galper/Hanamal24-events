@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   function startAutoSlide() {
+    stopAutoSlide(); // Clear any existing interval
     autoSlideInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
   }
   
@@ -68,6 +69,37 @@ document.addEventListener('DOMContentLoaded', function() {
   if (carousel) {
     carousel.addEventListener('mouseenter', stopAutoSlide);
     carousel.addEventListener('mouseleave', startAutoSlide);
+  }
+  
+  // Touch/swipe support for mobile
+  let touchStartX = 0;
+  let touchEndX = 0;
+  const minSwipeDistance = 50;
+  
+  if (carousel) {
+    carousel.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    
+    carousel.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, { passive: true });
+  }
+  
+  function handleSwipe() {
+    const swipeDistance = touchStartX - touchEndX;
+    if (Math.abs(swipeDistance) > minSwipeDistance) {
+      if (swipeDistance > 0) {
+        // Swipe left - next slide
+        nextSlide();
+      } else {
+        // Swipe right - previous slide
+        prevSlide();
+      }
+      stopAutoSlide();
+      startAutoSlide();
+    }
   }
   
   // Start auto-slide
