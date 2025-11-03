@@ -182,6 +182,17 @@ async function build() {
 
   console.log(`Found ${events?.length || 0} events, ${menus?.length || 0} menus, ${packages?.length || 0} packages, ${dishes?.length || 0} dishes, ${about?.length || 0} about records, ${hero?.length || 0} hero records, ${gallery?.length || 0} gallery items`);
   
+  // Debug: Show actual field names from Airtable data
+  if (about && about.length > 0) {
+    console.log("📋 About fields:", Object.keys(about[0]).join(", "));
+  }
+  if (hero && hero.length > 0) {
+    console.log("📋 Hero fields:", Object.keys(hero[0]).join(", "));
+  }
+  if (packages && packages.length > 0) {
+    console.log("📋 Package fields:", Object.keys(packages[0]).join(", "));
+  }
+  
   // Images are no longer processed from Airtable
   let cloudinaryImageMap = new Map();
   let imageMap = new Map();
@@ -323,12 +334,16 @@ async function build() {
   // home
   {
     // Get all hero data from Airtable for carousel
-    const activeHeroes = finalHero.filter(h => h["פעיל (Active)"] !== false);
+    const activeHeroes = finalHero.filter(h => {
+      const active = h["פעיל (Active)"] || h["Active"] || h.active !== false;
+      return active !== false;
+    });
     const heroSlides = activeHeroes.map((heroData, index) => {
       const heroImage = firstImageFrom(heroData, cloudinaryImageMap, imageMap);
       const heroVideo = firstVideoFrom(heroData);
-      const heroTitle = heroData["כותרת ראשית (Main Heading)"] || SITE_NAME;
-      const heroSubtitle = heroData["כותרת משנה (Subheading)"] || "חוויה קולינרית ייחודית לאירועים בלתי נשכחים";
+      // Try multiple possible field names
+      const heroTitle = heroData["כותרת ראשית (Main Heading)"] || heroData["Main Heading"] || heroData["כותרת"] || heroData.Title || heroData.Name || SITE_NAME;
+      const heroSubtitle = heroData["כותרת משנה (Subheading)"] || heroData["Subheading"] || heroData["כותרת משנה"] || heroData.Subtitle || heroData.Description || "חוויה קולינרית ייחודית לאירועים בלתי נשכחים";
       
       // Determine if we have a video or image
       const mediaUrl = heroVideo || heroImage;
@@ -417,20 +432,23 @@ async function build() {
     
     // About section - use Airtable data if available, otherwise fallback
     const aboutData = finalAbout.length > 0 ? finalAbout[0] : null;
+    // Try multiple possible field names from Airtable
+    const aboutTitle = aboutData?.["Section Title"] || aboutData?.["כותרת (Title)"] || aboutData?.Title || aboutData?.Name || SITE_NAME;
+    const aboutContent = aboutData?.Description || aboutData?.["תיאור (Description)"] || aboutData?.Content || aboutData?.["תוכן (Content)"] || aboutData?.Text || 
+      (finalAbout.length > 0 ? "תוכן מאירוטבל" : "מסעדת הנמל 24 מציעה חוויה קולינרית ייחודית באווירה אלגנטית וחמימה. אנו מתמחים באירועים פרטיים ועסקיים, ומציעים תפריטים מותאמים אישית לכל אירוע.");
+    const aboutImage = aboutData?.Image || aboutData?.["תמונה (Image)"] || (Array.isArray(aboutData?.["תמונה (Image)"]) ? aboutData["תמונה (Image)"][0]?.url : null);
     const aboutSection = `
       <section class="about-section" id="about">
         <div class="about-container">
           <h2 class="about-title">אודותינו</h2>
           <div class="about-content">
             <div class="about-text">
-              <h3>${aboutData?.["Section Title"] || SITE_NAME}</h3>
-              <p>
-                ${aboutData?.Description || aboutData?.Content || "מסעדת הנמל 24 מציעה חוויה קולינרית ייחודית באווירה אלגנטית וחמימה. אנו מתמחים באירועים פרטיים ועסקיים, ומציעים תפריטים מותאמים אישית לכל אירוע."}
-              </p>
-              ${aboutData?.Additional_Info ? `<p class="additional-info">${aboutData.Additional_Info}</p>` : ""}
+              <h3>${aboutTitle}</h3>
+              <p>${aboutContent}</p>
+              ${aboutData?.Additional_Info || aboutData?.["מידע נוסף"] ? `<p class="additional-info">${aboutData.Additional_Info || aboutData["מידע נוסף"]}</p>` : ""}
             </div>
             <div class="about-image">
-              ${aboutData?.Image ? `<img src="${aboutData.Image}" alt="אודות ${SITE_NAME}">` : `<div class="about-placeholder">🍽️</div>`}
+              ${aboutImage ? `<img src="${typeof aboutImage === 'string' ? aboutImage : aboutImage.url}" alt="אודות ${SITE_NAME}">` : `<div class="about-placeholder">🍽️</div>`}
             </div>
           </div>
         </div>
