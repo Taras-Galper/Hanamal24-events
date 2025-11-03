@@ -746,12 +746,47 @@ async function build() {
       site
     });
       // Add package and dish data for JavaScript
+      // Create gallery data with Cloudinary URLs mapped
+      const galleryDataWithCloudinaryUrls = galleryItemsWithImages.map(item => {
+        const cloudinaryUrl = firstImageFrom(item, cloudinaryImageMap, imageMap);
+        // Clone item and update Image field with Cloudinary URL
+        const itemCopy = JSON.parse(JSON.stringify(item)); // Deep clone
+        if (cloudinaryUrl) {
+          // Replace the Image field entirely with Cloudinary URL
+          if (Array.isArray(itemCopy.Image)) {
+            // Replace first image in array with Cloudinary URL
+            itemCopy.Image = [{
+              url: cloudinaryUrl,
+              id: itemCopy.Image[0]?.id || 'cloudinary',
+              width: itemCopy.Image[0]?.width || 800,
+              height: itemCopy.Image[0]?.height || 600,
+              filename: itemCopy.Image[0]?.filename || 'image.jpg',
+              type: itemCopy.Image[0]?.type || 'image/jpeg'
+            }];
+          } else if (itemCopy.Image) {
+            // Single image object
+            itemCopy.Image = {
+              url: cloudinaryUrl,
+              id: itemCopy.Image.id || 'cloudinary',
+              width: itemCopy.Image.width || 800,
+              height: itemCopy.Image.height || 600,
+              filename: itemCopy.Image.filename || 'image.jpg',
+              type: itemCopy.Image.type || 'image/jpeg'
+            };
+          } else {
+            // No Image field, add one
+            itemCopy.Image = [{ url: cloudinaryUrl }];
+          }
+        }
+        return itemCopy;
+      });
+      
       const packageDataScript = `
         <script>
           window.PACKAGE_DATA = ${JSON.stringify(finalPackages)};
           window.DISH_DATA = ${JSON.stringify(dishes)};
           window.PACKAGE_DISH_MAP = ${JSON.stringify(packageDishMap)};
-          window.GALLERY_DATA = ${JSON.stringify(activeGalleryItems)};
+          window.GALLERY_DATA = ${JSON.stringify(galleryDataWithCloudinaryUrls)};
         </script>
       `;
     

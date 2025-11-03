@@ -45,7 +45,7 @@ async function uploadToCloudinary(imageUrl, publicId) {
   try {
     const result = await cloudinary.uploader.upload(imageUrl, {
       public_id: publicId,
-      folder: 'hanamal24/images',
+      // Don't specify folder - public_id already includes the full path
       transformation: [
         { quality: 'auto', fetch_format: 'auto' }, // Auto optimization
         { width: 1200, height: 800, crop: 'fill' }  // Consistent sizing
