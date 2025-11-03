@@ -10,6 +10,7 @@ export default async function handler(req, res) {
     console.log('🔄 Airtable webhook received:', req.body);
     
     // Trigger GitHub Actions workflow using GitHub API
+    // This will set FORCE_FRESH_FETCH=true to fetch fresh data from Airtable
     const response = await fetch('https://api.github.com/repos/Taras-Galper/Hanamal24-events/actions/workflows/build.yml/dispatches', {
       method: 'POST',
       headers: {
@@ -20,7 +21,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         ref: 'main',
         inputs: {
-          reason: 'Airtable webhook triggered'
+          reason: 'Airtable button/webhook triggered - fetching fresh data'
         }
       })
     });

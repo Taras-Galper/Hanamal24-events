@@ -138,14 +138,18 @@ async function build() {
   if (fs.existsSync(outDir)) fs.rmSync(outDir, { recursive: true, force: true });
   copyStatic();
 
-  console.log("📂 Loading data from Airtable (fresh data on every build)...");
+  console.log("📂 Loading data from cached JSON files (no API calls)...");
   
-  // Always fetch fresh data from Airtable if credentials are available
-  // This ensures the site is always up-to-date when you're paying for Airtable
+  // Use cached JSON files by default to avoid unnecessary API calls
+  // Only fetch from Airtable when explicitly triggered via webhook/button
+  // This saves API credits and makes builds faster
   let events, menus, packages, dishes, about, hero, gallery;
   
-  if (hasAirtableCredentials) {
-    console.log("✅ Fetching fresh data from Airtable API...");
+  // Check if we should force fresh fetch (set via environment variable)
+  const FORCE_FRESH_FETCH = process.env.FORCE_FRESH_FETCH === 'true' || process.env.FORCE_FRESH_FETCH === '1';
+  
+  if (FORCE_FRESH_FETCH && hasAirtableCredentials) {
+    console.log("🔄 FORCE_FRESH_FETCH enabled - fetching fresh data from Airtable API...");
     [events, menus, packages, dishes, about, hero, gallery] = await Promise.all([
       fetchAll("Events"),
       fetchAll("Menus").catch(err => {
@@ -160,8 +164,8 @@ async function build() {
     ]);
     console.log("✅ Successfully fetched fresh data from Airtable");
   } else {
-    // Fallback to JSON files if no Airtable credentials
-    console.log("⚠️  No Airtable credentials - loading from local JSON files...");
+    // Load from cached JSON files (preferred method)
+    console.log("📁 Loading from cached JSON files in data/ folder...");
     events = loadJsonData("events.json");
     menus = loadJsonData("menus.json");
     packages = loadJsonData("packages.json");
@@ -170,7 +174,30 @@ async function build() {
     hero = loadJsonData("hero.json");
     gallery = loadJsonData("gallery.json");
     
-    // Use empty arrays if JSON files not found
+    // If JSON files don't exist and we have Airtable credentials, fetch once as fallback
+    const hasAnyJsonData = events !== null || menus !== null || packages !== null || 
+                          dishes !== null || about !== null || hero !== null || gallery !== null;
+    
+    if (!hasAnyJsonData && hasAirtableCredentials) {
+      console.log("⚠️  No cached JSON files found - fetching from Airtable (one-time setup)...");
+      [events, menus, packages, dishes, about, hero, gallery] = await Promise.all([
+        fetchAll("Events"),
+        fetchAll("Menus").catch(err => {
+          console.warn("⚠️  Could not fetch Menus table - using fallback content");
+          return [];
+        }),
+        fetchAll("tbl9C40JxeIkue5So"),
+        fetchAll("tblbi9b9lUjRRrAhW"),
+        fetchAll("tblvhDaSZbzlYP9bh"),
+        fetchAll("tblOe7ONKtB6A9Q6L"),
+        fetchAll("tblpfVJY9nEb5JDlQ")
+      ]);
+      console.log("✅ Fetched initial data from Airtable");
+    } else if (!hasAnyJsonData) {
+      console.log("⚠️  No cached data and no Airtable credentials - using fallback content");
+    }
+    
+    // Use empty arrays if data is null
     events = events || [];
     menus = menus || [];
     packages = packages || [];
