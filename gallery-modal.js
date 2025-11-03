@@ -187,8 +187,11 @@ class GalleryModalHandler {
     this.thumbnailsContainer.innerHTML = '';
     
     this.galleryData.forEach((item, index) => {
+      const imageUrl = this.getImageUrl(item);
+      if (!imageUrl) return; // Skip items without images
+      
       const thumbnail = document.createElement('img');
-      thumbnail.src = this.getImageUrl(item);
+      thumbnail.src = imageUrl;
       thumbnail.alt = item["כותרת (Title)"] || item.Title || item.Name || "תמונה";
       thumbnail.className = 'gallery-thumbnail';
       
@@ -223,9 +226,15 @@ class GalleryModalHandler {
       return;
     }
 
-    // Create HTML for new images
-    const newImagesHTML = imagesToLoad.map((item, index) => {
-      const imageUrl = this.getImageUrl(item);
+    // Filter out items without images and create HTML
+    const imagesWithUrls = imagesToLoad
+      .map((item, index) => {
+        const imageUrl = this.getImageUrl(item);
+        return { item, imageUrl, index };
+      })
+      .filter(({ imageUrl }) => imageUrl !== null);
+    
+    const newImagesHTML = imagesWithUrls.map(({ item, imageUrl, index }) => {
       const title = item["כותרת (Title)"] || item.Title || item.Name || "תמונה";
       const description = item["תיאור (Description)"] || item.Description || "";
       const globalIndex = this.currentImagesShown + index;
@@ -273,8 +282,32 @@ class GalleryModalHandler {
   }
 
   getImageUrl(item) {
-    // Images are no longer pulled from Airtable - return default placeholder
-    return "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&h=600&fit=crop";
+    // Extract image from record
+    const imageFields = [
+      "תמונה (Image)", "Image", "תמונה", "Picture", "Photo", 
+      "תמונה של המנה", "Event Photos"
+    ];
+    
+    for (const field of imageFields) {
+      if (item[field]) {
+        let imageUrl = null;
+        
+        if (Array.isArray(item[field])) {
+          imageUrl = item[field][0]?.url || item[field][0];
+        } else if (typeof item[field] === 'string') {
+          imageUrl = item[field];
+        } else if (item[field]?.url) {
+          imageUrl = item[field].url;
+        }
+        
+        if (imageUrl && typeof imageUrl === 'string') {
+          return imageUrl;
+        }
+      }
+    }
+    
+    // No image found - return null (don't use placeholder)
+    return null;
   }
 
   // getLocalImagePath method removed - images no longer pulled from Airtable

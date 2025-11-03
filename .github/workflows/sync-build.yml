@@ -8,6 +8,19 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Note: Linter warnings about context access are false positives.
+    # Secrets must be configured in: Settings → Secrets and variables → Actions → Secrets
+    # Variables should be configured in: Settings → Secrets and variables → Actions → Variables
+    # If variables are missing, shell defaults will be used in the build step.
+    env:
+      AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
+      AIRTABLE_BASE: ${{ secrets.AIRTABLE_BASE }}
+      BASE_URL: ${{ vars.BASE_URL }}
+      SITE_NAME: ${{ vars.SITE_NAME }}
+      SITE_CITY: ${{ vars.SITE_CITY }}
+      SITE_COUNTRY: ${{ vars.SITE_COUNTRY }}
+      CUISINE: ${{ vars.CUISINE }}
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,9 +34,6 @@ jobs:
         run: npm ci || npm i
 
       - name: Sync Airtable -> data
-        env:
-          AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
-          AIRTABLE_BASE: ${{ secrets.AIRTABLE_BASE }}
         run: npm run sync
 
       - name: Commit synced data (if changed)
@@ -35,12 +45,12 @@ jobs:
           git push || true
 
       - name: Build site
-        env:
-          BASE_URL: ${{ vars.BASE_URL }}
-          SITE_NAME: ${{ vars.SITE_NAME }}
-          SITE_CITY: ${{ vars.SITE_CITY }}
-          SITE_COUNTRY: ${{ vars.SITE_COUNTRY }}
-          CUISINE: ${{ vars.CUISINE }}
-        run: npm run build
+        run: |
+          export BASE_URL="${BASE_URL:-https://taras-galper.github.io/Hanamal24-events}"
+          export SITE_NAME="${SITE_NAME:-Hanamal 24}"
+          export SITE_CITY="${SITE_CITY:-Haifa}"
+          export SITE_COUNTRY="${SITE_COUNTRY:-IL}"
+          export CUISINE="${CUISINE:-French}"
+          npm run build
 
 

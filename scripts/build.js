@@ -99,8 +99,42 @@ function siteMeta() {
 }
 
 function firstImageFrom(record, cloudinaryImageMap = null, localImageMap = null) {
-  // Images are no longer pulled from Airtable - return default placeholder
-  return "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&h=600&fit=crop";
+  // Extract image from record
+  const imageFields = [
+    "תמונה (Image)", "Image", "תמונה", "Picture", "Photo", 
+    "תמונה של המנה", "Event Photos"
+  ];
+  
+  for (const field of imageFields) {
+    if (record[field]) {
+      let imageUrl = null;
+      
+      if (Array.isArray(record[field])) {
+        imageUrl = record[field][0]?.url || record[field][0];
+      } else if (typeof record[field] === 'string') {
+        imageUrl = record[field];
+      } else if (record[field]?.url) {
+        imageUrl = record[field].url;
+      }
+      
+      if (imageUrl && typeof imageUrl === 'string') {
+        // Use Cloudinary URL if available
+        if (cloudinaryImageMap && cloudinaryImageMap.has(imageUrl)) {
+          return cloudinaryImageMap.get(imageUrl);
+        }
+        // Use local image path if available
+        if (localImageMap && localImageMap.has(imageUrl)) {
+          const localPath = localImageMap.get(imageUrl);
+          return typeof localPath === 'string' ? localPath : localPath.localPath || imageUrl;
+        }
+        // Return original URL
+        return imageUrl;
+      }
+    }
+  }
+  
+  // No image found - return null (don't use placeholder)
+  return null;
 }
 
 function firstVideoFrom(record) {
@@ -484,7 +518,12 @@ async function build() {
     
     // Gallery section
     const activeGalleryItems = finalGallery.filter(item => item["פעיל (Active)"] !== false);
-    const totalImages = activeGalleryItems.length;
+    // Filter out items without images
+    const galleryItemsWithImages = activeGalleryItems.filter(item => {
+      const imageUrl = firstImageFrom(item, cloudinaryImageMap, imageMap);
+      return imageUrl !== null;
+    });
+    const totalImages = galleryItemsWithImages.length;
     const initialImages = 6;
     
     const gallerySection = `
@@ -492,7 +531,7 @@ async function build() {
         <div class="gallery-container">
           <h2 class="gallery-title">גלריית תמונות</h2>
           <div class="gallery-grid" id="gallery-grid">
-            ${activeGalleryItems.slice(0, initialImages).map((item, index) => {
+            ${galleryItemsWithImages.slice(0, initialImages).map((item, index) => {
               const imageUrl = firstImageFrom(item, cloudinaryImageMap, imageMap);
               const title = item["כותרת (Title)"] || item.Title || item.Name || "תמונה";
               const description = item["תיאור (Description)"] || item.Description || "";
