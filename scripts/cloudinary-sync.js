@@ -41,7 +41,7 @@ async function imageExistsInCloudinary(publicId) {
 }
 
 // Upload image from URL to Cloudinary
-async function uploadToCloudinary(imageUrl, publicId) {
+async function uploadToCloudinary(imageUrl, publicId, silent = false) {
   try {
     const result = await cloudinary.uploader.upload(imageUrl, {
       public_id: publicId,
@@ -61,10 +61,20 @@ async function uploadToCloudinary(imageUrl, publicId) {
       height: result.height
     };
   } catch (error) {
-    console.warn(`⚠️ Failed to upload to Cloudinary: ${error.message}`);
+    // Detect expired URLs (410 Gone errors from Airtable)
+    const isExpired = error.message.includes('410') || 
+                      error.message.includes('Gone') ||
+                      error.message.includes('Error in loading');
+    
+    // Only log non-expired errors if not in silent mode
+    if (!silent && !isExpired) {
+      console.warn(`⚠️ Failed to upload to Cloudinary: ${error.message}`);
+    }
+    
     return {
       success: false,
       error: error.message,
+      isExpired: isExpired,
       fallbackUrl: imageUrl // Use original URL as fallback
     };
   }
@@ -127,7 +137,7 @@ export async function syncImagesToCloudinary(data) {
   // Process images in batches to avoid rate limits
   const batchSize = 5;
   const imagesToProcess = Array.from(imageMap.entries());
-  const results = { uploaded: 0, skipped: 0, failed: 0 };
+  const results = { uploaded: 0, skipped: 0, failed: 0, expired: 0 };
 
   for (let i = 0; i < imagesToProcess.length; i += batchSize) {
     const batch = imagesToProcess.slice(i, i + batchSize);
@@ -141,11 +151,10 @@ export async function syncImagesToCloudinary(data) {
         const cloudinaryUrl = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/w_800,h_600,c_fill,f_auto,q_auto/${info.publicId}`;
         imageMap.set(originalUrl, cloudinaryUrl);
         results.skipped++;
-        console.log(`✅ Using existing: ${info.publicId}`);
         return { success: true, skipped: true };
       } else {
-        // Upload to Cloudinary
-        const uploadResult = await uploadToCloudinary(originalUrl, info.publicId);
+        // Upload to Cloudinary (silent mode for expired URLs)
+        const uploadResult = await uploadToCloudinary(originalUrl, info.publicId, true);
         
         if (uploadResult.success) {
           // Generate optimized URL
@@ -157,8 +166,14 @@ export async function syncImagesToCloudinary(data) {
         } else {
           // Keep original URL as fallback
           imageMap.set(originalUrl, uploadResult.fallbackUrl);
-          results.failed++;
-          return { success: false, error: uploadResult.error };
+          
+          if (uploadResult.isExpired) {
+            results.expired++;
+          } else {
+            results.failed++;
+            console.warn(`⚠️ Failed to upload: ${info.publicId} - ${uploadResult.error}`);
+          }
+          return { success: false, error: uploadResult.error, isExpired: uploadResult.isExpired };
         }
       }
     });
@@ -174,7 +189,12 @@ export async function syncImagesToCloudinary(data) {
   console.log(`☁️ Cloudinary sync complete:`);
   console.log(`   🚀 Uploaded: ${results.uploaded} new images`);
   console.log(`   ✅ Existing: ${results.skipped} images`);
-  console.log(`   ⚠️ Failed: ${results.failed} images`);
+  if (results.expired > 0) {
+    console.log(`   ⏰ Expired URLs: ${results.expired} (from cached data - run with FORCE_FRESH_FETCH=true to fetch fresh URLs)`);
+  }
+  if (results.failed > 0) {
+    console.log(`   ⚠️ Failed: ${results.failed} images`);
+  }
 
   return { imageMap, ...results };
 }

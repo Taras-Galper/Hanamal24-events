@@ -1,9 +1,11 @@
 // scripts/sync-airtable.js
 // One-time sync from Airtable to local JSON files in /data to minimize API usage at runtime
+// Downloads images IMMEDIATELY while URLs are fresh
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
+import { downloadAirtableImages } from './airtable-image-downloader.js';
 
 dotenv.config();
 
@@ -67,19 +69,38 @@ async function main() {
 
   console.log("🔁 Syncing Airtable -> data/*.json (minimize runtime API calls)");
 
+  // First, fetch all data from Airtable
+  const rawData = {};
   for (const t of tables) {
     try {
-      const outFile = path.join(dataDir, `${t.key}.json`);
-      console.log(`→ Fetching ${t.table} -> ${outFile}`);
-      const rows = await fetchAll(t.table, { view: "Grid view" });
-      fs.writeFileSync(outFile, JSON.stringify(rows, null, 2), "utf8");
-      console.log(`✅ ${t.key}: ${rows.length} records`);
+      console.log(`→ Fetching ${t.table}...`);
+      rawData[t.key] = await fetchAll(t.table, { view: "Grid view" });
+      console.log(`✅ ${t.key}: ${rawData[t.key].length} records`);
     } catch (err) {
       console.error(`❌ Failed to sync ${t.key}:`, err.message);
+      rawData[t.key] = [];
     }
   }
 
-  console.log("🏁 Sync complete.");
+  // Now download all images IMMEDIATELY (while URLs are fresh)
+  console.log("\n📸 Downloading images from Airtable (while URLs are fresh)...");
+  const { data: processedData, stats } = await downloadAirtableImages(rawData);
+
+  // Save processed data (with local image paths) to JSON files
+  for (const t of tables) {
+    const outFile = path.join(dataDir, `${t.key}.json`);
+    const dataToSave = processedData[t.key] || rawData[t.key] || [];
+    fs.writeFileSync(outFile, JSON.stringify(dataToSave, null, 2), "utf8");
+    console.log(`💾 Saved ${t.key}.json with ${dataToSave.length} records (images downloaded)`);
+  }
+
+  console.log("\n🏁 Sync complete.");
+  console.log("📊 Image download stats:");
+  Object.entries(stats).forEach(([type, typeStats]) => {
+    if (typeStats.downloaded > 0 || typeStats.skipped > 0 || typeStats.failed > 0) {
+      console.log(`  ${type}: ${typeStats.downloaded} new, ${typeStats.skipped} reused, ${typeStats.failed} failed`);
+    }
+  });
 }
 
 main().catch(err => {

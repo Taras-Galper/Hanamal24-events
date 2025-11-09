@@ -118,16 +118,27 @@ function firstImageFrom(record, cloudinaryImageMap = null, localImageMap = null)
       }
       
       if (imageUrl && typeof imageUrl === 'string') {
-        // Use Cloudinary URL if available
+        // Priority 1: If it's already a local path (from downloaded images), use it directly
+        if (imageUrl.startsWith('/images/')) {
+          return imageUrl;
+        }
+        
+        // Priority 2: Use Cloudinary URL if available (for optimization)
         if (cloudinaryImageMap && cloudinaryImageMap.has(imageUrl)) {
           return cloudinaryImageMap.get(imageUrl);
         }
-        // Use local image path if available
+        
+        // Priority 3: Use local image map if available
         if (localImageMap && localImageMap.has(imageUrl)) {
           const localPath = localImageMap.get(imageUrl);
           return typeof localPath === 'string' ? localPath : localPath.localPath || imageUrl;
         }
-        // Return original URL
+        
+        // Priority 4: Return original URL (may be expired Airtable URL - not ideal)
+        // This should rarely happen if sync worked correctly
+        if (imageUrl.startsWith('http')) {
+          console.warn(`⚠️ Using Airtable URL (may expire): ${imageUrl.substring(0, 50)}...`);
+        }
         return imageUrl;
       }
     }
@@ -197,6 +208,27 @@ async function build() {
       fetchAll("tblpfVJY9nEb5JDlQ") // Gallery table ID
     ]);
     console.log("✅ Successfully fetched fresh data from Airtable");
+    
+    // Download images IMMEDIATELY while URLs are fresh
+    console.log("📸 Downloading images immediately (while URLs are fresh)...");
+    try {
+      const { downloadAirtableImages } = await import('./airtable-image-downloader.js');
+      const rawData = { events, menus, packages, dishes, gallery, hero, about };
+      const { data: processedData } = await downloadAirtableImages(rawData);
+      
+      // Use processed data with local image paths
+      events = processedData.events || events;
+      menus = processedData.menus || menus;
+      packages = processedData.packages || packages;
+      dishes = processedData.dishes || dishes;
+      gallery = processedData.gallery || gallery;
+      hero = processedData.hero || hero;
+      about = processedData.about || about;
+      
+      console.log("✅ Images downloaded and data updated with local paths");
+    } catch (error) {
+      console.warn("⚠️ Image download failed, using original URLs:", error.message);
+    }
   } else {
     // Load from cached JSON files (preferred method)
     console.log("📁 Loading from cached JSON files in data/ folder...");
@@ -227,6 +259,27 @@ async function build() {
         fetchAll("tblpfVJY9nEb5JDlQ")
       ]);
       console.log("✅ Fetched initial data from Airtable");
+      
+      // Download images IMMEDIATELY while URLs are fresh
+      console.log("📸 Downloading images immediately (while URLs are fresh)...");
+      try {
+        const { downloadAirtableImages } = await import('./airtable-image-downloader.js');
+        const rawData = { events, menus, packages, dishes, gallery, hero, about };
+        const { data: processedData } = await downloadAirtableImages(rawData);
+        
+        // Use processed data with local image paths
+        events = processedData.events || events;
+        menus = processedData.menus || menus;
+        packages = processedData.packages || packages;
+        dishes = processedData.dishes || dishes;
+        gallery = processedData.gallery || gallery;
+        hero = processedData.hero || hero;
+        about = processedData.about || about;
+        
+        console.log("✅ Images downloaded and data updated with local paths");
+      } catch (error) {
+        console.warn("⚠️ Image download failed, using original URLs:", error.message);
+      }
     } else if (!hasAnyJsonData) {
       console.log("⚠️  No cached data and no Airtable credentials - using fallback content");
     }
@@ -254,91 +307,151 @@ async function build() {
     console.log("📋 Package fields:", Object.keys(packages[0]).join(", "));
   }
   
-  // Process images with Cloudinary if configured
+  // Process images - prioritize local images from downloaded data
+  // Images should already be downloaded and have local paths in the data
   let cloudinaryImageMap = new Map();
   let imageMap = new Map();
   
-  // Try to sync images to Cloudinary if credentials are available
-  try {
-    const { syncImagesToCloudinary } = await import('./cloudinary-sync.js');
-    const data = { events, menus, packages, dishes, gallery, hero, about };
-    const cloudinaryResult = await syncImagesToCloudinary(data);
-    cloudinaryImageMap = cloudinaryResult.imageMap || new Map();
-    console.log(`☁️ Cloudinary sync: ${cloudinaryResult.uploaded || 0} uploaded, ${cloudinaryResult.skipped || 0} existing`);
-  } catch (error) {
-    console.log('📸 Cloudinary sync skipped:', error.message);
+  // Count local vs remote images
+  let localImageCount = 0;
+  let remoteImageCount = 0;
+  
+  const checkImageSource = (records) => {
+    records?.forEach(record => {
+      const imageFields = ["תמונה (Image)", "Image", "תמונה", "Picture", "Photo", "תמונה של המנה", "Event Photos"];
+      for (const field of imageFields) {
+        if (record[field]) {
+          const images = Array.isArray(record[field]) ? record[field] : [record[field]];
+          images.forEach(img => {
+            const url = img?.url || img;
+            if (url && typeof url === 'string') {
+              if (url.startsWith('/images/')) {
+                localImageCount++;
+              } else if (url.startsWith('http')) {
+                remoteImageCount++;
+              }
+            }
+          });
+        }
+      }
+    });
+  };
+  
+  checkImageSource(events);
+  checkImageSource(packages);
+  checkImageSource(dishes);
+  checkImageSource(gallery);
+  checkImageSource(hero);
+  checkImageSource(about);
+  checkImageSource(menus);
+  
+  console.log(`📸 Images: ${localImageCount} local, ${remoteImageCount} remote URLs`);
+  
+  // Optional: Try to sync remote images to Cloudinary for optimization
+  // But don't fail if Cloudinary is not configured - local images are primary
+  if (remoteImageCount > 0) {
+    try {
+      const { syncImagesToCloudinary } = await import('./cloudinary-sync.js');
+      const data = { events, menus, packages, dishes, gallery, hero, about };
+      const cloudinaryResult = await syncImagesToCloudinary(data);
+      cloudinaryImageMap = cloudinaryResult.imageMap || new Map();
+      console.log(`☁️ Cloudinary sync: ${cloudinaryResult.uploaded || 0} uploaded, ${cloudinaryResult.skipped || 0} existing`);
+    } catch (error) {
+      console.log('📸 Cloudinary sync skipped (using local images):', error.message);
+    }
+  } else {
+    console.log('✅ All images are local - no Cloudinary sync needed');
   }
   
-  // Add fallback content if no Airtable data
-  const fallbackHero = [{
-    "כותרת ראשית (Main Heading)": SITE_NAME,
-    "כותרת משנה (Subheading)": "חוויה קולינרית ייחודית לאירועים בלתי נשכחים",
-    "פעיל (Active)": true
-  }];
+  // Only use Airtable data when FORCE_FRESH_FETCH is enabled
+  // Otherwise, provide fallback content for development
+  let finalHero, finalAbout, finalPackages, finalMenus, finalGallery;
   
-  const fallbackAbout = [{
-    "כותרת (Title)": "אודות הנמל 24",
-    "תוכן (Content)": "מסעדת הנמל 24 מציעה חוויה קולינרית ייחודית עם מטבח צרפתי איכותי. אנו מתמחים באירועים פרטיים, חתונות, ימי הולדת ואירועים עסקיים. הצוות המקצועי שלנו מבטיח שכל אירוע יהיה בלתי נשכח.",
-    "פעיל (Active)": true
-  }];
-  
-  const fallbackPackages = [
-    {
-      "שם חבילה (Package Name)": "חבילת VIP",
-      "תיאור (Description)": "חבילה יוקרתית הכוללת תפריט מלא, שירות ברמה גבוהה וכל הפרטים הקטנים",
-      "מחיר (Price)": "₪500-800 לאדם",
+  if (FORCE_FRESH_FETCH) {
+    // When forcing fresh fetch, only use Airtable data - no fallbacks
+    finalHero = hero;
+    finalAbout = about;
+    finalPackages = packages;
+    finalMenus = menus;
+    finalGallery = gallery;
+    
+    if (hero.length === 0) console.warn("⚠️  No hero data from Airtable");
+    if (about.length === 0) console.warn("⚠️  No about data from Airtable");
+    if (packages.length === 0) console.warn("⚠️  No packages from Airtable");
+    if (menus.length === 0) console.warn("⚠️  No menus from Airtable");
+    if (gallery.length === 0) console.warn("⚠️  No gallery data from Airtable");
+  } else {
+    // Use fallback content only when not forcing fresh fetch (for development)
+    const fallbackHero = [{
+      "כותרת ראשית (Main Heading)": SITE_NAME,
+      "כותרת משנה (Subheading)": "חוויה קולינרית ייחודית לאירועים בלתי נשכחים",
       "פעיל (Active)": true
-    },
-    {
-      "שם חבילה (Package Name)": "חבילת סטנדרט",
-      "תיאור (Description)": "חבילה איכותית עם תפריט מגוון ושירות מקצועי",
-      "מחיר (Price)": "₪300-500 לאדם",
+    }];
+    
+    const fallbackAbout = [{
+      "כותרת (Title)": "אודות הנמל 24",
+      "תוכן (Content)": "מסעדת הנמל 24 מציעה חוויה קולינרית ייחודית עם מטבח צרפתי איכותי. אנו מתמחים באירועים פרטיים, חתונות, ימי הולדת ואירועים עסקיים. הצוות המקצועי שלנו מבטיח שכל אירוע יהיה בלתי נשכח.",
       "פעיל (Active)": true
-    }
-  ];
-  
-  const fallbackMenus = [
-    {
-      "Title": "תפריט ערב",
-      "Description": "תפריט ערב מגוון עם מנות צרפתיות קלאסיות",
-      "slug": "evening-menu",
-      "Dishes": []
-    },
-    {
-      "Title": "תפריט אירועים",
-      "Description": "תפריט מיוחד לאירועים וחגיגות",
-      "slug": "events-menu", 
-      "Dishes": []
-    }
-  ];
-  
-  const fallbackGallery = [
-    {
-      "תמונה (Image)": "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&h=600&fit=crop",
-      "כותרת (Title)": "חלל המסעדה",
-      "תיאור (Description)": "אווירה חמה ומזמינה",
-      "פעיל (Active)": true
-    },
-    {
-      "תמונה (Image)": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop",
-      "כותרת (Title)": "מנות גורמה",
-      "תיאור (Description)": "מנות איכותיות וטעימות",
-      "פעיל (Active)": true
-    },
-    {
-      "תמונה (Image)": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop",
-      "כותרת (Title)": "אירועים מיוחדים",
-      "תיאור (Description)": "חוויות בלתי נשכחות",
-      "פעיל (Active)": true
-    }
-  ];
-  
-  // Use fallback data if no Airtable data available
-  const finalHero = hero.length > 0 ? hero : fallbackHero;
-  const finalAbout = about.length > 0 ? about : fallbackAbout;
-  const finalPackages = packages.length > 0 ? packages : fallbackPackages;
-  const finalMenus = menus.length > 0 ? menus : fallbackMenus;
-  const finalGallery = gallery.length > 0 ? gallery : fallbackGallery;
+    }];
+    
+    const fallbackPackages = [
+      {
+        "שם חבילה (Package Name)": "חבילת VIP",
+        "תיאור (Description)": "חבילה יוקרתית הכוללת תפריט מלא, שירות ברמה גבוהה וכל הפרטים הקטנים",
+        "מחיר (Price)": "₪500-800 לאדם",
+        "פעיל (Active)": true
+      },
+      {
+        "שם חבילה (Package Name)": "חבילת סטנדרט",
+        "תיאור (Description)": "חבילה איכותית עם תפריט מגוון ושירות מקצועי",
+        "מחיר (Price)": "₪300-500 לאדם",
+        "פעיל (Active)": true
+      }
+    ];
+    
+    const fallbackMenus = [
+      {
+        "Title": "תפריט ערב",
+        "Description": "תפריט ערב מגוון עם מנות צרפתיות קלאסיות",
+        "slug": "evening-menu",
+        "Dishes": []
+      },
+      {
+        "Title": "תפריט אירועים",
+        "Description": "תפריט מיוחד לאירועים וחגיגות",
+        "slug": "events-menu", 
+        "Dishes": []
+      }
+    ];
+    
+    const fallbackGallery = [
+      {
+        "תמונה (Image)": "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&h=600&fit=crop",
+        "כותרת (Title)": "חלל המסעדה",
+        "תיאור (Description)": "אווירה חמה ומזמינה",
+        "פעיל (Active)": true
+      },
+      {
+        "תמונה (Image)": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop",
+        "כותרת (Title)": "מנות גורמה",
+        "תיאור (Description)": "מנות איכותיות וטעימות",
+        "פעיל (Active)": true
+      },
+      {
+        "תמונה (Image)": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop",
+        "כותרת (Title)": "אירועים מיוחדים",
+        "תיאור (Description)": "חוויות בלתי נשכחות",
+        "פעיל (Active)": true
+      }
+    ];
+    
+    // Use fallback data if no Airtable data available (only when not forcing fresh fetch)
+    finalHero = hero.length > 0 ? hero : fallbackHero;
+    finalAbout = about.length > 0 ? about : fallbackAbout;
+    finalPackages = packages.length > 0 ? packages : fallbackPackages;
+    finalMenus = menus.length > 0 ? menus : fallbackMenus;
+    finalGallery = gallery.length > 0 ? gallery : fallbackGallery;
+  }
 
   const dishMap = Object.fromEntries(dishes.map(d => [d.id, d]));
   const menuMap = Object.fromEntries(
@@ -508,7 +621,7 @@ async function build() {
     const aboutTitle = aboutData?.["Section Title"] || aboutData?.["כותרת (Title)"] || aboutData?.Title || aboutData?.Name || SITE_NAME;
     const aboutContent = aboutData?.Description || aboutData?.["תיאור (Description)"] || aboutData?.Content || aboutData?.["תוכן (Content)"] || aboutData?.Text || 
       (finalAbout.length > 0 ? "תוכן מאירוטבל" : "מסעדת הנמל 24 מציעה חוויה קולינרית ייחודית באווירה אלגנטית וחמימה. אנו מתמחים באירועים פרטיים ועסקיים, ומציעים תפריטים מותאמים אישית לכל אירוע.");
-    const aboutImage = aboutData?.Image || aboutData?.["תמונה (Image)"] || (Array.isArray(aboutData?.["תמונה (Image)"]) ? aboutData["תמונה (Image)"][0]?.url : null);
+    const aboutImage = firstImageFrom(aboutData, cloudinaryImageMap, imageMap);
     const aboutSection = `
       <section class="about-section" id="about">
         <div class="about-container">
@@ -520,7 +633,7 @@ async function build() {
               ${aboutData?.Additional_Info || aboutData?.["מידע נוסף"] ? `<p class="additional-info">${aboutData.Additional_Info || aboutData["מידע נוסף"]}</p>` : ""}
             </div>
             <div class="about-image">
-              ${aboutImage ? `<img src="${typeof aboutImage === 'string' ? aboutImage : aboutImage.url}" alt="אודות ${SITE_NAME}">` : `<div class="about-placeholder">🍽️</div>`}
+              ${aboutImage ? `<img src="${aboutImage}" alt="אודות ${SITE_NAME}">` : `<div class="about-placeholder">🍽️</div>`}
             </div>
           </div>
         </div>
@@ -579,10 +692,12 @@ async function build() {
         <div class="packages-container">
           <h2 class="packages-title">חבילות האירועים שלנו</h2>
           <div class="packages-grid">
-            ${finalPackages.map((pkg, index) => `
+            ${finalPackages.map((pkg, index) => {
+              const packageImage = firstImageFrom(pkg, cloudinaryImageMap, imageMap);
+              return `
               <div class="package-card" data-package-id="${pkg.id || `package-${index}`}" onclick="openPackageModal('${pkg.id || `package-${index}`}')">
                 <div class="package-image-container">
-                  ${pkg["תמונה (Image)"] ? `<img src="${Array.isArray(pkg["תמונה (Image)"]) ? pkg["תמונה (Image)"][0].url : pkg["תמונה (Image)"]}" alt="${pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name}" class="package-image" loading="lazy" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.add('show');"><div class="image-placeholder">📦</div>` : `<div class="image-placeholder show">📦</div>`}
+                  ${packageImage ? `<img src="${packageImage}" alt="${pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name}" class="package-image" loading="lazy" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.add('show');"><div class="image-placeholder">📦</div>` : `<div class="image-placeholder show">📦</div>`}
                 </div>
                 <div class="package-content">
                   <h3 class="package-title">${pkg["שם חבילה (Package Name)"] || pkg.Title || pkg.Name || "חבילה"}</h3>
@@ -591,7 +706,8 @@ async function build() {
                   <button class="package-link" onclick="event.stopPropagation(); openPackageModal('${pkg.id || `package-${index}`}')">לפרטים נוספים</button>
                 </div>
               </div>
-            `).join("")}
+            `;
+            }).join("")}
           </div>
         </div>
       </section>
@@ -781,9 +897,42 @@ async function build() {
         return itemCopy;
       });
       
+      // Update package data with Cloudinary URLs
+      const packageDataWithCloudinaryUrls = finalPackages.map(pkg => {
+        const cloudinaryUrl = firstImageFrom(pkg, cloudinaryImageMap, imageMap);
+        if (!cloudinaryUrl) return pkg; // No image, return as-is
+        
+        const pkgCopy = JSON.parse(JSON.stringify(pkg)); // Deep clone
+        if (Array.isArray(pkgCopy["תמונה (Image)"])) {
+          // Replace first image in array with Cloudinary URL
+          pkgCopy["תמונה (Image)"] = [{
+            url: cloudinaryUrl,
+            id: pkgCopy["תמונה (Image)"][0]?.id || 'cloudinary',
+            width: pkgCopy["תמונה (Image)"][0]?.width || 800,
+            height: pkgCopy["תמונה (Image)"][0]?.height || 600,
+            filename: pkgCopy["תמונה (Image)"][0]?.filename || 'image.jpg',
+            type: pkgCopy["תמונה (Image)"][0]?.type || 'image/jpeg'
+          }];
+        } else if (pkgCopy["תמונה (Image)"]) {
+          // Single image object
+          pkgCopy["תמונה (Image)"] = [{
+            url: cloudinaryUrl,
+            id: pkgCopy["תמונה (Image)"].id || 'cloudinary',
+            width: pkgCopy["תמונה (Image)"].width || 800,
+            height: pkgCopy["תמונה (Image)"].height || 600,
+            filename: pkgCopy["תמונה (Image)"].filename || 'image.jpg',
+            type: pkgCopy["תמונה (Image)"].type || 'image/jpeg'
+          }];
+        } else {
+          // No Image field, add one
+          pkgCopy["תמונה (Image)"] = [{ url: cloudinaryUrl }];
+        }
+        return pkgCopy;
+      });
+      
       const packageDataScript = `
         <script>
-          window.PACKAGE_DATA = ${JSON.stringify(finalPackages)};
+          window.PACKAGE_DATA = ${JSON.stringify(packageDataWithCloudinaryUrls)};
           window.DISH_DATA = ${JSON.stringify(dishes)};
           window.PACKAGE_DISH_MAP = ${JSON.stringify(packageDishMap)};
           window.GALLERY_DATA = ${JSON.stringify(galleryDataWithCloudinaryUrls)};
