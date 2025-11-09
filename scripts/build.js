@@ -240,6 +240,85 @@ async function build() {
     hero = loadJsonData("hero.json");
     gallery = loadJsonData("gallery.json");
     
+    // Check if cached data has Airtable URLs that need to be downloaded
+    const hasAirtableUrls = (records) => {
+      if (!records || records.length === 0) return false;
+      for (const record of records) {
+        const imageFields = ["תמונה (Image)", "Image", "תמונה", "Picture", "Photo", "תמונה של המנה", "Event Photos"];
+        for (const field of imageFields) {
+          if (record[field]) {
+            const images = Array.isArray(record[field]) ? record[field] : [record[field]];
+            for (const img of images) {
+              const url = img?.url || img;
+              if (url && typeof url === 'string' && url.startsWith('http') && !url.startsWith('/images/')) {
+                return true; // Found Airtable URL
+              }
+            }
+          }
+        }
+      }
+      return false;
+    };
+    
+    const needsImageDownload = hasAirtableUrls(events) || hasAirtableUrls(packages) || 
+                               hasAirtableUrls(dishes) || hasAirtableUrls(gallery) || 
+                               hasAirtableUrls(hero) || hasAirtableUrls(about) || hasAirtableUrls(menus);
+    
+    // If cached data has Airtable URLs, fetch fresh data and download images immediately
+    // This ensures we get fresh URLs before they expire
+    if (needsImageDownload && hasAirtableCredentials) {
+      console.log("📸 Cached data contains Airtable URLs - fetching fresh data and downloading images...");
+      try {
+        // Fetch fresh data from Airtable to get fresh URLs
+        console.log("🔄 Fetching fresh data from Airtable...");
+        [events, menus, packages, dishes, about, hero, gallery] = await Promise.all([
+          fetchAll("Events"),
+          fetchAll("Menus").catch(err => {
+            console.warn("⚠️  Could not fetch Menus table - using cached data");
+            return menus || [];
+          }),
+          fetchAll("tbl9C40JxeIkue5So"),
+          fetchAll("tblbi9b9lUjRRrAhW"),
+          fetchAll("tblvhDaSZbzlYP9bh"),
+          fetchAll("tblOe7ONKtB6A9Q6L"),
+          fetchAll("tblpfVJY9nEb5JDlQ")
+        ]);
+        console.log("✅ Fetched fresh data from Airtable");
+        
+        // Download images IMMEDIATELY while URLs are fresh
+        console.log("📸 Downloading images immediately (while URLs are fresh)...");
+        const { downloadAirtableImages } = await import('./airtable-image-downloader.js');
+        const rawData = { events, menus, packages, dishes, gallery, hero, about };
+        const { data: processedData } = await downloadAirtableImages(rawData);
+        
+        // Use processed data with local image paths
+        events = processedData.events || events;
+        menus = processedData.menus || menus;
+        packages = processedData.packages || packages;
+        dishes = processedData.dishes || dishes;
+        gallery = processedData.gallery || gallery;
+        hero = processedData.hero || hero;
+        about = processedData.about || about;
+        
+        console.log("✅ Images downloaded and data updated with local paths");
+        
+        // Save updated data back to JSON files for next time
+        const dataDir = path.join(__dirname, "..", "data");
+        if (events) fs.writeFileSync(path.join(dataDir, "events.json"), JSON.stringify(events, null, 2));
+        if (menus) fs.writeFileSync(path.join(dataDir, "menus.json"), JSON.stringify(menus, null, 2));
+        if (packages) fs.writeFileSync(path.join(dataDir, "packages.json"), JSON.stringify(packages, null, 2));
+        if (dishes) fs.writeFileSync(path.join(dataDir, "dishes.json"), JSON.stringify(dishes, null, 2));
+        if (gallery) fs.writeFileSync(path.join(dataDir, "gallery.json"), JSON.stringify(gallery, null, 2));
+        if (hero) fs.writeFileSync(path.join(dataDir, "hero.json"), JSON.stringify(hero, null, 2));
+        if (about) fs.writeFileSync(path.join(dataDir, "about.json"), JSON.stringify(about, null, 2));
+        
+        console.log("💾 Updated JSON files with local image paths");
+      } catch (error) {
+        console.warn("⚠️ Failed to fetch fresh data/download images, using cached data:", error.message);
+        // Continue with cached data if fetch fails
+      }
+    }
+    
     // If JSON files don't exist and we have Airtable credentials, fetch once as fallback
     const hasAnyJsonData = events !== null || menus !== null || packages !== null || 
                           dishes !== null || about !== null || hero !== null || gallery !== null;
