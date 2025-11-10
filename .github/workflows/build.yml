@@ -30,7 +30,6 @@ jobs:
     # Use github-pages environment for deployment (required for new Pages actions)
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     # Note: Linter warnings about context access are false positives.
     # These secrets must be configured in repository settings:
     # Settings → Secrets and variables → Actions → Secrets
