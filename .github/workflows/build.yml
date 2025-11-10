@@ -18,6 +18,12 @@ on:
       - 'data/*.json'
       - '.env'
 
+# Grant permissions for GitHub Pages deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -36,6 +42,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for proper git operations
         
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -83,4 +91,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           force_orphan: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
         continue-on-error: true
