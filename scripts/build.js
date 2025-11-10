@@ -266,6 +266,8 @@ async function build() {
     
     // If cached data has Airtable URLs, fetch fresh data and download images immediately
     // This ensures we get fresh URLs before they expire
+    // Note: If sync was just run (workflow_dispatch), images may already be downloaded
+    // but we still need to fetch fresh data to get updated content
     if (needsImageDownload && hasAirtableCredentials) {
       console.log("📸 Cached data contains Airtable URLs - fetching fresh data and downloading images...");
       try {
@@ -302,17 +304,24 @@ async function build() {
         
         console.log("✅ Images downloaded and data updated with local paths");
         
-        // Save updated data back to JSON files for next time
-        const dataDir = path.join(__dirname, "..", "data");
-        if (events) fs.writeFileSync(path.join(dataDir, "events.json"), JSON.stringify(events, null, 2));
-        if (menus) fs.writeFileSync(path.join(dataDir, "menus.json"), JSON.stringify(menus, null, 2));
-        if (packages) fs.writeFileSync(path.join(dataDir, "packages.json"), JSON.stringify(packages, null, 2));
-        if (dishes) fs.writeFileSync(path.join(dataDir, "dishes.json"), JSON.stringify(dishes, null, 2));
-        if (gallery) fs.writeFileSync(path.join(dataDir, "gallery.json"), JSON.stringify(gallery, null, 2));
-        if (hero) fs.writeFileSync(path.join(dataDir, "hero.json"), JSON.stringify(hero, null, 2));
-        if (about) fs.writeFileSync(path.join(dataDir, "about.json"), JSON.stringify(about, null, 2));
-        
-        console.log("💾 Updated JSON files with local image paths");
+        // Save updated data back to JSON files for next time (if data directory exists)
+        try {
+          const dataDir = path.join(__dirname, "..", "data");
+          if (!fs.existsSync(dataDir)) {
+            fs.mkdirSync(dataDir, { recursive: true });
+          }
+          if (events) fs.writeFileSync(path.join(dataDir, "events.json"), JSON.stringify(events, null, 2));
+          if (menus) fs.writeFileSync(path.join(dataDir, "menus.json"), JSON.stringify(menus, null, 2));
+          if (packages) fs.writeFileSync(path.join(dataDir, "packages.json"), JSON.stringify(packages, null, 2));
+          if (dishes) fs.writeFileSync(path.join(dataDir, "dishes.json"), JSON.stringify(dishes, null, 2));
+          if (gallery) fs.writeFileSync(path.join(dataDir, "gallery.json"), JSON.stringify(gallery, null, 2));
+          if (hero) fs.writeFileSync(path.join(dataDir, "hero.json"), JSON.stringify(hero, null, 2));
+          if (about) fs.writeFileSync(path.join(dataDir, "about.json"), JSON.stringify(about, null, 2));
+          console.log("💾 Updated JSON files with local image paths");
+        } catch (saveError) {
+          console.warn("⚠️ Could not save updated JSON files (non-critical):", saveError.message);
+          // Continue with build - this is not critical
+        }
       } catch (error) {
         console.warn("⚠️ Failed to fetch fresh data/download images, using cached data:", error.message);
         // Continue with cached data if fetch fails
