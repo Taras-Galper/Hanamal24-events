@@ -27,6 +27,10 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Use github-pages environment for deployment (required for new Pages actions)
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     # Note: Linter warnings about context access are false positives.
     # These secrets must be configured in repository settings:
     # Settings → Secrets and variables → Actions → Secrets
@@ -77,20 +81,17 @@ jobs:
           FORCE_FRESH_FETCH: ${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}
         run: npm run build
         
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist-files
-          path: dist/
-          retention-days: 7
-          
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+        if: github.ref == 'refs/heads/main'
+        
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         if: github.ref == 'refs/heads/main'
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          force_orphan: true
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
-        continue-on-error: true
+          path: ./dist
+          
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        if: github.ref == 'refs/heads/main'
