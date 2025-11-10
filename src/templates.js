@@ -19,6 +19,10 @@ export function layout({ title, description, body, url, image, jsonld, site }) {
 <meta property="og:url" content="${canonical}">
 <meta property="og:image" content="${ogImage}">
 <meta name="twitter:card" content="summary_large_image">
+<!-- Google Fonts - Premium Hebrew fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&family=Varela+Round&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WYN0CWD8ZC"></script>
