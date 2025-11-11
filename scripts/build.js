@@ -1272,5 +1272,13 @@ async function build() {
   console.log(`Build complete. Pages: ${urls.length}`);
 }
 
-await build();
+// Wrap build in try-catch for better error handling
+try {
+  await build();
+  console.log("✅ Build completed successfully");
+} catch (error) {
+  console.error("❌ Build failed:", error.message);
+  console.error(error.stack);
+  process.exit(1);
+}
 

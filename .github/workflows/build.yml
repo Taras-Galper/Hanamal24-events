@@ -73,7 +73,8 @@ jobs:
           
       - name: Sync Airtable data (if triggered by webhook/button)
         if: github.event_name == 'workflow_dispatch' || github.event.inputs.reason != ''
-        run: npm run sync
+        run: npm run sync || echo "⚠️ Sync failed, continuing with cached data"
+        continue-on-error: true
 
       - name: Build site
         env:
