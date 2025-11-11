@@ -150,90 +150,89 @@ async function processRecordImages(record, recordType) {
         }
         
         // Need to download - but first check if we have the same content
-          try {
-            console.log(`⬇️ Downloading: ${filename} from ${imageUrl.substring(0, 50)}...`);
-            const { filePath: downloadedPath, buffer, contentHash } = await downloadImage(imageUrl, filePath);
+        try {
+          console.log(`⬇️ Downloading: ${filename} from ${imageUrl.substring(0, 50)}...`);
+          const { filePath: downloadedPath, buffer, contentHash } = await downloadImage(imageUrl, filePath);
+          
+          // Check 2: Do we already have this image content (even if from different record)?
+          if (registry.byContentHash[contentHash] && fs.existsSync(registry.byContentHash[contentHash].filePath)) {
+            // Same image content exists - reuse the existing file
+            const existingEntry = registry.byContentHash[contentHash];
+            const existingFilename = path.basename(existingEntry.filePath);
+            const existingPath = `/images/${existingFilename}`;
             
-            // Check 2: Do we already have this image content (even if from different record)?
-            if (registry.byContentHash[contentHash] && fs.existsSync(registry.byContentHash[contentHash].filePath)) {
-              // Same image content exists - reuse the existing file
-              const existingEntry = registry.byContentHash[contentHash];
-              const existingFilename = path.basename(existingEntry.filePath);
-              const existingPath = `/images/${existingFilename}`;
-              
-              // Delete the duplicate we just downloaded
-              if (fs.existsSync(filePath) && filePath !== existingEntry.filePath) {
-                fs.unlinkSync(filePath);
-              }
-              
-              // Register this record+field to use the existing image
-              registry.byKey[registryKey] = {
-                filename: existingFilename,
-                localPath: existingPath,
-                recordType,
-                recordId: record.id,
-                fieldName: field,
-                index: i,
-                downloadedAt: new Date().toISOString(),
-                originalUrl: imageUrl,
-                contentHash,
-                reusedFrom: existingEntry.registryKey
-              };
-              
-              processedImages.push({
-                url: existingPath,
-                id: img?.id || 'local',
-                width: img?.width || 800,
-                height: img?.height || 600,
-                filename: existingFilename,
-                type: img?.type || 'image/jpeg',
-                local: true
-              });
-              
-              skippedCount++;
-              console.log(`♻️ Reusing by content: ${existingFilename} (same image, different record)`);
-            } else {
-              // Truly new image - save it
-              registry.byKey[registryKey] = {
-                filename,
-                localPath,
-                recordType,
-                recordId: record.id,
-                fieldName: field,
-                index: i,
-                downloadedAt: new Date().toISOString(),
-                originalUrl: imageUrl,
-                contentHash
-              };
-              
-              // Register by content hash for future deduplication
-              registry.byContentHash[contentHash] = {
-                filePath,
-                filename,
-                localPath,
-                registryKey,
-                firstSeenAt: new Date().toISOString()
-              };
-              
-              processedImages.push({
-                url: localPath,
-                id: img?.id || 'local',
-                width: img?.width || 800,
-                height: img?.height || 600,
-                filename: filename,
-                type: img?.type || 'image/jpeg',
-                local: true
-              });
-              
-              downloadedCount++;
-              console.log(`✅ Downloaded: ${filename}`);
+            // Delete the duplicate we just downloaded
+            if (fs.existsSync(filePath) && filePath !== existingEntry.filePath) {
+              fs.unlinkSync(filePath);
             }
-          } catch (error) {
-            console.warn(`⚠️ Failed to download ${imageUrl}: ${error.message}`);
-            // Keep original URL as fallback (though it may expire)
-            processedImages.push(img);
-            failedCount++;
+            
+            // Register this record+field to use the existing image
+            registry.byKey[registryKey] = {
+              filename: existingFilename,
+              localPath: existingPath,
+              recordType,
+              recordId: record.id,
+              fieldName: field,
+              index: i,
+              downloadedAt: new Date().toISOString(),
+              originalUrl: imageUrl,
+              contentHash,
+              reusedFrom: existingEntry.registryKey
+            };
+            
+            processedImages.push({
+              url: existingPath,
+              id: img?.id || 'local',
+              width: img?.width || 800,
+              height: img?.height || 600,
+              filename: existingFilename,
+              type: img?.type || 'image/jpeg',
+              local: true
+            });
+            
+            skippedCount++;
+            console.log(`♻️ Reusing by content: ${existingFilename} (same image, different record)`);
+          } else {
+            // Truly new image - save it
+            registry.byKey[registryKey] = {
+              filename,
+              localPath,
+              recordType,
+              recordId: record.id,
+              fieldName: field,
+              index: i,
+              downloadedAt: new Date().toISOString(),
+              originalUrl: imageUrl,
+              contentHash
+            };
+            
+            // Register by content hash for future deduplication
+            registry.byContentHash[contentHash] = {
+              filePath,
+              filename,
+              localPath,
+              registryKey,
+              firstSeenAt: new Date().toISOString()
+            };
+            
+            processedImages.push({
+              url: localPath,
+              id: img?.id || 'local',
+              width: img?.width || 800,
+              height: img?.height || 600,
+              filename: filename,
+              type: img?.type || 'image/jpeg',
+              local: true
+            });
+            
+            downloadedCount++;
+            console.log(`✅ Downloaded: ${filename}`);
           }
+        } catch (error) {
+          console.warn(`⚠️ Failed to download ${imageUrl}: ${error.message}`);
+          // Keep original URL as fallback (though it may expire)
+          processedImages.push(img);
+          failedCount++;
         }
       }
       
