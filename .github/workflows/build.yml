@@ -81,6 +81,16 @@ jobs:
           FORCE_FRESH_FETCH: ${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}
         run: npm run build
         
+      - name: Verify dist folder exists
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "❌ dist folder not found after build!"
+            exit 1
+          fi
+          echo "✅ dist folder exists"
+          echo "📊 Dist folder contents:"
+          ls -la dist/ | head -20
+          
       - name: Setup Pages
         uses: actions/configure-pages@v4
         if: github.ref == 'refs/heads/main'
